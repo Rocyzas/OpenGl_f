@@ -1,3 +1,6 @@
 # OpenGl_f
 OpenGL Graphics
-Initial Commit
+
+'qmake' to generate makefile from  OrthoDemo.pro
+'make' to compile
+'./OrthoDemo'(name defined as TARGET in .pro file) to run
