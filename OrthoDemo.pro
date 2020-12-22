@@ -9,11 +9,11 @@ INCLUDEPATH += . /opt/local/include
 
 CONFIG += C++11
 
-QT += widgets opengl gui 
+QT += widgets opengl gui
 
-LIBS += -lGLU
+LIBS += -lGLU -lglut -lGL
 # Input
-HEADERS += OrthoDemoWidget.h OrthoDemoWindow.h 
+HEADERS += OrthoDemoWidget.h OrthoDemoWindow.h
 SOURCES += OrthoDemoMain.cpp \
            OrthoDemoWidget.cpp \
            OrthoDemoWindow.cpp

@@ -18,6 +18,8 @@ class OrthoDemoWidget: public QGLWidget
 	public slots:
 				// called by the timer in the main window
 	void updateAngle();
+	void updateAngleManual(int);
+	// void updateAngleManualV(int);
 
 	protected:
 	// called when OpenGL context is set up
@@ -32,6 +34,8 @@ class OrthoDemoWidget: public QGLWidget
 	private:
 
 	  void pyramid(float size, const materialStruct&);
+
+		void hexo(float, float, float, float, const materialStruct&);
 
 	  void LoadDialog(const Ui_Dialog&);
 	  void UnloadDialog(const Ui_Dialog&);

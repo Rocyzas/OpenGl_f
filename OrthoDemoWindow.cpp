@@ -27,18 +27,25 @@ OrthoDemoWindow::OrthoDemoWindow(QWidget *parent)
 	windowLayout->addWidget(cubeWidget);
 
 // =========================================
-	ptimer = new QTimer(this);
-
-	ptimer->start(20);
-
-	connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
+	// ptimer = new QTimer(this);
+	//
+	// ptimer->start(20);
+	//
+	// connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
+	// ptimer->stop();
 // =========================================
+	nSlider = new QSlider(Qt::Horizontal);
+	connect(nSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateAngleManual(int)));
+	windowLayout->addWidget(nSlider);
 
+	// nSliderV = new QSlider(Qt::Vertical);
+	// connect(nSliderV, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateAngleManualV(int)));
+	// windowLayout->addWidget(nSliderV);
 	} // constructor
 
 OrthoDemoWindow::~OrthoDemoWindow()
 	{ // destructor
-	delete nVerticesSlider;
+	delete nSlider;
 	delete cubeWidget;
 	delete windowLayout;
 	delete actionQuit;
@@ -49,9 +56,12 @@ OrthoDemoWindow::~OrthoDemoWindow()
 // resets all the interface elements
 void OrthoDemoWindow::ResetInterface()
 	{ // ResetInterface()
-	nVerticesSlider->setMinimum(3);
-	nVerticesSlider->setMaximum(30);
+	// nVerticesSlider->setMinimum(3);
+	// nVerticesSlider->setMaximum(30);
 
+	nSlider->setMinimum(0);
+	nSlider->setMaximum(360);
+	nSlider->setValue(0);
 	//don't use the slider for now
 
 	//	nVerticesSlider->setValue(thePolygon->nVertices);

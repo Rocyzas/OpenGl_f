@@ -1,10 +1,12 @@
 #include <QApplication>
 #include <QVBoxLayout>
 #include "OrthoDemoWindow.h"
+#include <GL/glut.h>
 
 int main(int argc, char *argv[])
 	{ // main()
 	// create the application
+	glutInit( & argc, argv );
 	QApplication app(argc, argv);
 
 	// create model (polygon) as a triangle
@@ -28,7 +30,7 @@ int main(int argc, char *argv[])
 	// clean up
 	//	delete controller;
 	delete window;
-	
+
 	// return to caller
-	return 0; 
+	return 0;
 	} // main()

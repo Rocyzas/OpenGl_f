@@ -31,7 +31,7 @@ class OrthoDemoWindow: public QWidget
 	// beneath that, the main widget
 	OrthoDemoWidget *cubeWidget;
 	// and a slider for the number of vertices
-	QSlider *nVerticesSlider;
+	QSlider *nSlider;
 
 	// resets all the interface elements
 	void ResetInterface();
