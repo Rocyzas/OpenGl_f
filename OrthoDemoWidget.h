@@ -18,6 +18,7 @@ class OrthoDemoWidget: public QGLWidget
 	public slots:
 				// called by the timer in the main window
 	void updateAngle();
+	void zoomIn(int);
 	void updateAngleManual(int);
 	// void updateAngleManualV(int);
 
@@ -32,14 +33,24 @@ class OrthoDemoWidget: public QGLWidget
 	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	private:
+		double _angle;
+		bool _b_lighting;
+		double _time;
+		double _scaler;
 
-	  void pyramid(float size, const materialStruct&);
-
+	  void pyramid(float, const materialStruct&);
+		void cylinder(float, float, const materialStruct&);
 		void hexo(float, float, float, float, const materialStruct&);
-
+		void sphere(const materialStruct&);
+		void sidePoly(const materialStruct&);
+		void cylinderforarm(const materialStruct&);
+		void arm(double, double, double);
+		void wheel();
+		void renderPlane(const materialStruct&);
+		void unify(double _time);
+// UI
 	  void LoadDialog(const Ui_Dialog&);
 	  void UnloadDialog(const Ui_Dialog&);
-
 	  struct OrthoPar {
 	    float _x_min;
 	    float _x_max;
@@ -62,7 +73,6 @@ class OrthoDemoWidget: public QGLWidget
 	      _z_max(z_max){}
 
 	  };
-
 	  struct GluPar {
 	    float _x;
 	    float _y;
@@ -94,12 +104,10 @@ class OrthoDemoWidget: public QGLWidget
 	      _up_z(up_z){}
 
 	  };
-
 	  OrthoPar _ortho_par;
 	  GluPar _glupar;
-	  bool _b_lighting;
 	  Ui_Dialog _ui;
-		double _angle;
+
 	}; // class GLPolygonWidget
 
 #endif

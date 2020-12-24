@@ -27,13 +27,14 @@ OrthoDemoWindow::OrthoDemoWindow(QWidget *parent)
 	windowLayout->addWidget(cubeWidget);
 
 // =========================================
-	// ptimer = new QTimer(this);
-	//
+	ptimer = new QTimer(this);
 	// ptimer->start(20);
-	//
 	// connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
 	// ptimer->stop();
-// =========================================
+	aSlider = new QSlider(Qt::Horizontal);
+	connect(aSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(zoomIn(int)));
+	windowLayout->addWidget(aSlider);
+// ========================================= virsuj neveikia, apacioj veikia signals
 	nSlider = new QSlider(Qt::Horizontal);
 	connect(nSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateAngleManual(int)));
 	windowLayout->addWidget(nSlider);
