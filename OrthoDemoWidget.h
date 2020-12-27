@@ -19,6 +19,7 @@ class OrthoDemoWidget: public QGLWidget
 				// called by the timer in the main window
 	void updateAngle();
 	void zoomIn(int);
+	void moveVehicle(int);
 	void updateAngleManual(int);
 	// void updateAngleManualV(int);
 
@@ -34,19 +35,24 @@ class OrthoDemoWidget: public QGLWidget
 
 	private:
 		double _angle;
+		double _angleWh;
 		bool _b_lighting;
 		double _time;
 		double _scaler;
+		double _movement;
 
 	  void pyramid(float, const materialStruct&);
 		void cylinder(float, float, const materialStruct&);
 		void hexo(float, float, float, float, const materialStruct&);
 		void sphere(const materialStruct&);
-		void sidePoly(const materialStruct&);
+		void roof(float, const materialStruct& );
+		void sideGroundPoly(float, const materialStruct&);
+		void sideUPPoly(float, const materialStruct&);
+		void windowsPoly(float, const materialStruct&);
 		void cylinderforarm(const materialStruct&);
 		void arm(double, double, double);
-		void wheel();
-		void renderPlane(const materialStruct&);
+		void wheelAxes(float, float , float, float);
+		float wheelRotateAngle(float);
 		void unify(double _time);
 // UI
 	  void LoadDialog(const Ui_Dialog&);
