@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = app
-FORMS = dialog.ui
+#FORMS = dialog.ui
 TARGET = OrthoDemo
 INCLUDEPATH += . /opt/local/include
 

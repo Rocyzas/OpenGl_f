@@ -12,7 +12,6 @@ class OrthoDemoWindow: public QWidget
 	{
 	public:
 
-
 	// constructor / destructor
 	OrthoDemoWindow(QWidget *parent);
 	~OrthoDemoWindow();
@@ -27,12 +26,20 @@ class OrthoDemoWindow: public QWidget
 
 	// window layout
 	QBoxLayout *windowLayout;
+	// sceneLayout
+	QBoxLayout *sceneLayout;
+	// ui
+	QBoxLayout *uiLayout;
+
 	QTimer *ptimer;
 	// beneath that, the main widget
 	OrthoDemoWidget *cubeWidget;
 	// and a slider for the number of vertices
 	QSlider *aSlider;
 	QSlider *nSlider;
+	QSlider *mSlider;
+	QSlider *nVerticalSlider;
+	QSlider *doorSlider;
 
 	// resets all the interface elements
 	void ResetInterface();

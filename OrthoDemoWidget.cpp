@@ -6,39 +6,82 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+// TODO list:
+/*
+==NOT DONE==
+lighting (normals and normalise)
+textures
+wheels to turn by 'radius' angle
+wheels to spin acordingly
+make a stop and play button
+Windows with glTranslatef
+Back with hierarchical
+Doors with hierarchical
+
+
+==HALF DONE==
+Plane with color
+
+*/
+
+static const GLfloat radius = 2;
+static const float speed = 0.4;
 static const float PI = 3.1415926535;
 static const int N        = 100; // This determines the number of faces of the cylinder
 static const int n_div   =  100;  // This determines the fineness of the cylinder along its length
 static const int StartingPosition = -80;
 GLUquadric* qobj;
+static const int rot[3] = {0,1,0}; //for rotating
+float TotalDistance =0;
 
-
-void OrthoDemoWidget::updateAngle(){
-  _angleWh -= 1.0; //clockwise
-  // _time +=0.25;
-  // printf("UpdateAngle %f\n", _angleWh);
+void OrthoDemoWidget::updateCameraYAngle(int angle){
+  _y_camera_angle = angle;
   this->repaint();
 }
-// cia widget.cpp
+
+// For infinite rotation(has to be set)
+void OrthoDemoWidget::updateAngle(){
+  float Wheelsize = 1;
+  TotalDistance += speed;
+  _angleWhole = TotalDistance;
+  _wheelRotate = -360*(int(TotalDistance)%360)/(2*PI*Wheelsize);
+  // printf("UpdateAngle %f, %f\n", _angleWhole, _wheelRotate);
+  this->repaint();
+}
+
+void OrthoDemoWidget::doorsOpen(int d){
+  _doorsAngle = _doorsAngle%360 + 1;
+  printf("%f %i\n", _doorsAngle, d);
+  this->repaint();
+}
+
+// when zooming in
 void OrthoDemoWidget::zoomIn(int d){
   _scaler = 1 + d -pow(d, 0.97);
   printf("ZoomIn %f, %d\n", _scaler, d);
   this->repaint();
 }
+//
+// Moving the vehicle among the x axis
+// void OrthoDemoWidget::moveVehicle(int i){
+//   _movement = i*0.25 + StartingPosition;
+//   printf("MoveVehicl: %f, %f\n", _movement, i);
+//   this->repaint();
+// }
 
-void OrthoDemoWidget::moveVehicle(int i){
-  _movement = i*0.1 + StartingPosition;
-  printf("MoveVehicl: %f, %f\n", _movement, i);
-  // printf("%f\n", _movement);
-  this->repaint();
+// void OrthoDemoWidget::updateAngleManual(int i){
+//   _angle = 3*i;
+//   printf("updateAngleManual: %f, %f\n", _angle, i);
+//   this->repaint();
+// }
+
+float OrthoDemoWidget::wheelRotateAngle(float size){
+  // printf("%f, %f\n", -1*(_movement*360)/(2*PI*size), _movement);
+  //TODO:_scaler is running two functions (way to avoid is to get rid of widget and do UI menu)
+  // _wheelRotate = 360*(int(TotalDistance)%360)/(2*PI*Wheelsize);
+  // return -1*(_movement*360)/(2*PI*size)/_scaler;
+  return 360/(2*PI*size);
 }
-
-void OrthoDemoWidget::updateAngleManual(int i){
-  _angle = 3*i;
-  printf("updateAngleManual: %f, %f\n", _angle, i);
-  this->repaint();
-}
-
 
 // Setting up material properties
 typedef struct materialStruct {
@@ -90,18 +133,17 @@ static materialStruct redShinyMaterials = {
 // constructor
 OrthoDemoWidget::OrthoDemoWidget(QWidget *parent)
   : QGLWidget(parent),
-    _ortho_par(-90.,0.,-45, 45,-200.,200),
-    _glupar(0.,0.,100.,0.,0.,0.,0.,1.,0.),
     _b_lighting(true),
     _angle(0.0),
-    _angleWh(0.0),
     _time(0),
     _scaler(1.0),
+    _wheelRotate(0),
+    _doorsAngle(0),
     _movement(StartingPosition)
 	{ // constructor
 
+} // constructor
 
-	} // constructor
 
 // called when OpenGL context is set up
 void OrthoDemoWidget::initializeGL()
@@ -122,27 +164,20 @@ void OrthoDemoWidget::initializeGL()
     // // <0, 1, 0> pointing upward.
     // glMatrixMode(GL_MODELVIEW);
     // glLoadIdentity();
-    // gluLookAt(60, 6, 5, 1000, 1000, 1000, 0, 100, 0);
+
 
 
 	// glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-
-	glOrtho(_ortho_par._x_min,
-		_ortho_par._x_max,
-		_ortho_par._y_min,
-		_ortho_par._y_max,
-		_ortho_par._z_min,
-		_ortho_par._z_max);
-  // glOrtho(-100.,100.,-100.,100.,-200.,200);
+    glOrtho(-100.,100.,-100.,100.,-200.,200);
 
 } // initializeGL()
 
 
 // called every time the widget is resized
-void OrthoDemoWidget::resizeGL(int w, int h)
-	{ // resizeGL()
-	// set the viewport to the entire widget
+void OrthoDemoWidget::resizeGL(int w, int h){
+
+  // set the viewport to the entire widget
 	glViewport(0, 0, w, h);
 
 	glEnable(GL_LIGHTING); // enable lighting in general
@@ -251,7 +286,7 @@ void OrthoDemoWidget::roof(float side, const materialStruct& material){
   else
     glDisable(GL_LIGHTING);
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient); //spalvos tsg
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
   glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
   glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
   glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
@@ -314,13 +349,15 @@ void OrthoDemoWidget::roof(float side, const materialStruct& material){
     glVertex3f(47,7,side);
   glEnd();
 
+//TODO there should be hierarchical modeling of the back
+
 // BACK
-  // glBegin(GL_POLYGON);//8
-  //   glVertex3f(29,7,8.14);
-  //   glVertex3f(29,7,-8.14);
-  //   glVertex3f(47,7,-8.14);
-  //   glVertex3f(47,7,8.14);
-  // glEnd();
+  glBegin(GL_POLYGON);//8
+    glVertex3f(47,7,side);
+    glVertex3f(47,7,-side);
+    glVertex3f(46,3,-side);
+    glVertex3f(46,3,side);
+  glEnd();
 
   glBegin(GL_POLYGON);//9
     glVertex3f(46,3,side);
@@ -384,6 +421,7 @@ void OrthoDemoWidget::sideUPPoly(float side, const materialStruct& material){
     glVertex3f(35.5,8,side);
   glEnd();
 }
+
 void OrthoDemoWidget::sideGroundPoly(float side, const materialStruct& material){
   if (_b_lighting)
     glEnable(GL_LIGHTING);
@@ -432,27 +470,32 @@ void OrthoDemoWidget::sideGroundPoly(float side, const materialStruct& material)
   glEnd();
 
   // FIRST Doors
-  glBegin(GL_TRIANGLES);//7
-    glVertex3f(11,0,side);
-    glVertex3f(19,0,side);
-    glVertex3f(11,7,side);
-  glEnd();
-  glBegin(GL_TRIANGLES);//8
-    glVertex3f(19,0,side);
-    glVertex3f(19,7,side);
-    glVertex3f(11,7,side);
-  glEnd();
-  //SECOND Doors
-  glBegin(GL_TRIANGLES);//9
-    glVertex3f(19,7,side);
-    glVertex3f(19,0,side);
-    glVertex3f(28,0,side);
-  glEnd();
-  glBegin(GL_TRIANGLES);//10
-    glVertex3f(28,0,side);
-    glVertex3f(28,7,side);
-    glVertex3f(19,7,side);
-  glEnd();
+  glPushMatrix();
+    glRotatef(_doorsAngle, 0,1,0);
+    glBegin(GL_TRIANGLES);//7
+      glVertex3f(11,0,side);
+      glVertex3f(19,0,side);
+      glVertex3f(11,7,side);
+    glEnd();
+    glBegin(GL_TRIANGLES);//8
+      glVertex3f(19,0,side);
+      glVertex3f(19,7,side);
+      glVertex3f(11,7,side);
+    glEnd();
+
+    //SECOND Doors
+    glBegin(GL_TRIANGLES);//9
+      glVertex3f(19,7,side);
+      glVertex3f(19,0,side);
+      glVertex3f(28,0,side);
+    glEnd();
+    glBegin(GL_TRIANGLES);//10
+      glVertex3f(28,0,side);
+      glVertex3f(28,7,side);
+      glVertex3f(19,7,side);
+    glEnd();
+  glPopMatrix();
+  
   //THIRD
   glBegin(GL_TRIANGLES);//11
     glVertex3f(28,0,side);
@@ -520,26 +563,20 @@ void OrthoDemoWidget::sideGroundPoly(float side, const materialStruct& material)
 }
 
 
-float OrthoDemoWidget::wheelRotateAngle(float size){
-  // float angle;
-  // float movementSize = 1; //should be automatic (maybe global variable)
-  _angleWh = -1*(_movement*360)/(2*PI*size);
-  // printf("%f, %f\n", -1*(_movement*360)/(2*PI*size), _movement);
-  return _angleWh;
-}
-
 void OrthoDemoWidget::wheelAxes(float wheelWidth, float whichWheel, float ZaxisPosition, float wheelSize){
 
   //left axis
   glPushMatrix();
      glTranslatef(whichWheel, 0, -ZaxisPosition);
-     glRotatef(wheelRotateAngle(wheelSize), 0,0,1);
+     // glRotatef(wheelRotateAngle(wheelSize), 0,0,1);
+     glRotatef(_wheelRotate, 0,0,1);
     this->hexo(wheelWidth, wheelSize, 3, 6, blueShinyMaterials);
   glPopMatrix();
 
   glPushMatrix(); //sitas pisa i centra
     glTranslatef(whichWheel, 0, ZaxisPosition);
-    glRotatef(wheelRotateAngle(wheelSize), 0,0,1);
+    // glRotatef(wheelRotateAngle(wheelSize), 0,0,1);
+    glRotatef(_wheelRotate, 0,0,1);
     this->hexo(wheelWidth, wheelSize, 3, 6, whiteShinyMaterials);
   glPopMatrix();
 
@@ -552,113 +589,73 @@ void OrthoDemoWidget::wheelAxes(float wheelWidth, float whichWheel, float ZaxisP
 
 void OrthoDemoWidget::unify(double time){
 
-  int rot[3] = {1,0,0}; //for rotating
-
   glLoadIdentity();
-  glMatrixMode(GL_MODELVIEW);
-  gluLookAt(0,4,4,  0,3,0,  0,1,0);
+  // glMatrixMode(GL_MODELVIEW);
 
-  glPushMatrix(); //left wheelset
-    glTranslatef(_movement, 0, 0);
-    glScalef(_scaler, _scaler, _scaler);
-    glRotatef(_angle, rot[0], rot[1], rot[2]);
+  glPushMatrix();
+    // glTranslatef(_movement, 0, 0);
+    // glScalef(_scaler, _scaler, _scaler);
+    // glRotatef(_angleWhole, rot[0], rot[1], rot[2]);
+
+    glRotatef(_y_camera_angle, 1., 0., 0.);
+    glRotatef(_angleWhole, 0., 1., 0.); //change _angle or _angleWhole
+    glTranslatef(_movement, radius, 0);
+    glScalef(_scaler,_scaler,_scaler);
+    //
+    glRotatef(90, 0,1,0);//Rotate the car itself
     this->wheelAxes(1, 6.5, 8.14, 1.8);
-    //I can create a separate PushPop, if vehicle would drive while rotating each side differently
     this->wheelAxes(1, 38.5, 8.14, 1.8);
-  glPopMatrix();
 
-  glPushMatrix(); //vehicle side
-    glTranslatef(_movement, 0, 0);
-    glRotatef(_angle, rot[0], rot[1], rot[2]);
-    glScalef(_scaler, _scaler, _scaler);
     this->sideGroundPoly(-8.14, greenShinyMaterials);
     this->sideGroundPoly(8.14, blueShinyMaterials);
+
     this->sideUPPoly(-8.14, redShinyMaterials);
     this->sideUPPoly(8.14, redShinyMaterials);
+
     this->roof(8.14, whiteShinyMaterials);
+
     this->windowsPoly(8.14, greenShinyMaterials);
+
   glPopMatrix();
 
 }
 
 // called every time the widget needs painting
-void OrthoDemoWidget::paintGL()
-	{ // paintGL()
+void OrthoDemoWidget::paintGL(){
 	// clear the widget
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glEnable(GL_NORMALIZE);
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_NORMALIZE);
 
-        glShadeModel(GL_FLAT);
-        	// You must set the matrix mode to model view directly before enabling the depth test
-      	glMatrixMode(GL_MODELVIEW);
-       	glEnable(GL_DEPTH_TEST); // comment out depth test to observe the result
+  glShadeModel(GL_FLAT);
+	glMatrixMode(GL_MODELVIEW);
+ 	glEnable(GL_DEPTH_TEST);
 
-        //SETTING UP THE PLANE
-        glPushMatrix();
-        glColor3f(0.5f, 0.0f, 1.0f);
-        glScalef(_scaler, _scaler, _scaler);
-        glBegin(GL_POLYGON);
-        glColor3f(1.0f, 0.99f, 1.0f);
-          glVertex3f(-100, -5, 100);
-          glColor3f(1.0f, 0.99f, 1.0f);
-          glVertex3f(100, -5, 100);
-          glColor3f(1.0f, 0.99f, 1.0f);
-          glVertex3f(100, -5, -100);
-          glColor3f(1.0f, 0.99f, 1.0f);
-          glVertex3f(-100, -5, -100);
-        glEnd();
-        glPopMatrix();
 
-        unify(_time);
+  glLoadIdentity();
+  gluLookAt(0,100,0,  0,0,0,  0,0,1);
+  // gluLookAt(0., 5., 0.0, 0.0,0.0,0.0, 0.0,0.0,1.0);
+  // glRotatef(_y_camera_angle, 1., 0., 0.);
+
+  renderPlane(whiteShinyMaterials);
+
+  unify(_time);
 	glFlush();
-
-	} // paintGL()
-
-void OrthoDemoWidget::mouseDoubleClickEvent (QMouseEvent* event )
-{
-  QDialog *widget = new QDialog;
-  _ui.setupUi(widget);
-  this->LoadDialog(_ui);
-  widget->exec();
-  this->UnloadDialog(_ui);
 }
 
-void OrthoDemoWidget::LoadDialog(const Ui_Dialog& dialog)
-{
-  _ui.xmin->setText(QString::number(_ortho_par._x_min));
-  _ui.xmax->setText(QString::number(_ortho_par._x_max));
-  _ui.ymin->setText(QString::number(_ortho_par._y_min));
-  _ui.ymax->setText(QString::number(_ortho_par._y_max));
-  _ui.zmin->setText(QString::number(_ortho_par._z_min));
-  _ui.zmax->setText(QString::number(_ortho_par._z_max));
-  _ui.pos1->setText(QString::number(_glupar._x));
-  _ui.pos2->setText(QString::number(_glupar._y));
-  _ui.pos3->setText(QString::number(_glupar._z));
-  _ui.at1->setText(QString::number(_glupar._at_x));
-  _ui.at2->setText(QString::number(_glupar._at_y));
-  _ui.at3->setText(QString::number(_glupar._at_z));
-  _ui.up1->setText(QString::number(_glupar._up_x));
-  _ui.up2->setText(QString::number(_glupar._up_y));
-  _ui.up3->setText(QString::number(_glupar._up_z));
-  _ui.blight->setCheckState(_b_lighting ? Qt::Checked : Qt::Unchecked);
-}
+void OrthoDemoWidget::renderPlane(const materialStruct& material){
 
-void OrthoDemoWidget::UnloadDialog(const Ui_Dialog& dialog)
-{
-  _ortho_par._x_min = dialog.xmin->toPlainText().toFloat();
-  _ortho_par._y_min = dialog.ymin->toPlainText().toFloat();
-  _ortho_par._z_min = dialog.zmin->toPlainText().toFloat();
-  _ortho_par._x_max = dialog.xmax->toPlainText().toFloat();
-  _ortho_par._y_max = dialog.ymax->toPlainText().toFloat();
-  _ortho_par._z_max = dialog.zmax->toPlainText().toFloat();
-  _glupar._x = dialog.pos1->toPlainText().toFloat();
-  _glupar._y = dialog.pos2->toPlainText().toFloat();
-  _glupar._z = dialog.pos3->toPlainText().toFloat();
-  _glupar._at_x = dialog.at1->toPlainText().toFloat();
-  _glupar._at_y = dialog.at2->toPlainText().toFloat();
-  _glupar._at_z = dialog.at3->toPlainText().toFloat();
-  _glupar._up_x = dialog.up1->toPlainText().toFloat();
-  _glupar._up_y = dialog.up2->toPlainText().toFloat();
-  _glupar._up_z = dialog.up3->toPlainText().toFloat();
-  _b_lighting = (_ui.blight->checkState() == Qt::Checked) ? true : false;
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
+
+
+  GLfloat normals[][3] = { {0., 1. ,0.} };
+  glNormal3fv(normals[0]);
+  glBegin(GL_POLYGON);
+    glVertex3f(-100, -100, 0);
+    glVertex3f(100, -100, 0);
+    glVertex3f(100, 100, 0);
+    glVertex3f(-100,  100, 0);
+  glEnd();
 }

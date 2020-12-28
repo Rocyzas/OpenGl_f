@@ -3,7 +3,6 @@
 
 #include <QGLWidget>
 #include <QObject>
-#include "ui_dialog.h"
 
 struct materialStruct;
 
@@ -17,11 +16,13 @@ class OrthoDemoWidget: public QGLWidget
 
 	public slots:
 				// called by the timer in the main window
+	void updateCameraYAngle(int);
 	void updateAngle();
 	void zoomIn(int);
-	void moveVehicle(int);
-	void updateAngleManual(int);
-	// void updateAngleManualV(int);
+	void doorsOpen(int);
+	// void moveVehicle(int);
+	// void updateAngleManual(int);
+	float wheelRotateAngle(float);
 
 	protected:
 	// called when OpenGL context is set up
@@ -31,15 +32,17 @@ class OrthoDemoWidget: public QGLWidget
 	// called every time the widget needs painting
 	void paintGL();
 
-	void mouseDoubleClickEvent ( QMouseEvent * event );
 
 	private:
 		double _angle;
-		double _angleWh;
+		double _angleWhole; //for a whole car
 		bool _b_lighting;
 		double _time;
 		double _scaler;
 		double _movement;
+		double _y_camera_angle;
+		double _wheelRotate;
+		int _doorsAngle;
 
 	  void pyramid(float, const materialStruct&);
 		void cylinder(float, float, const materialStruct&);
@@ -52,67 +55,9 @@ class OrthoDemoWidget: public QGLWidget
 		void cylinderforarm(const materialStruct&);
 		void arm(double, double, double);
 		void wheelAxes(float, float , float, float);
-		float wheelRotateAngle(float);
-		void unify(double _time);
+		void renderPlane(const materialStruct&);
+		void unify(double);
 // UI
-	  void LoadDialog(const Ui_Dialog&);
-	  void UnloadDialog(const Ui_Dialog&);
-	  struct OrthoPar {
-	    float _x_min;
-	    float _x_max;
-	    float _y_min;
-	    float _y_max;
-	    float _z_min;
-	    float _z_max;
-
-	    OrthoPar(float x_min,
-		     float x_max,
-		     float y_min,
-		     float y_max,
-		     float z_min,
-		     float z_max):
-	      _x_min(x_min),
-	      _x_max(x_max),
-	      _y_min(y_min),
-	      _y_max(y_max),
-	      _z_min(z_min),
-	      _z_max(z_max){}
-
-	  };
-	  struct GluPar {
-	    float _x;
-	    float _y;
-	    float _z;
-	    float _at_x;
-	    float _at_y;
-	    float _at_z;
-	    float _up_x;
-	    float _up_y;
-	    float _up_z;
-
-	    GluPar( float x,
-		    float y,
-		    float z,
-		    float at_x,
-		    float at_y,
-		    float at_z,
-		    float up_x,
-		    float up_y,
-		    float up_z ):
-	      _x(x),
-	      _y(y),
-	      _z(z),
-	      _at_x(at_x),
-	      _at_y(at_y),
-	      _at_z(at_z),
-	      _up_x(up_x),
-	      _up_y(up_y),
-	      _up_z(up_z){}
-
-	  };
-	  OrthoPar _ortho_par;
-	  GluPar _glupar;
-	  Ui_Dialog _ui;
 
 	}; // class GLPolygonWidget
 
