@@ -31,11 +31,13 @@ OrthoDemoWindow::OrthoDemoWindow(QWidget *parent)
 	nVerticalSlider = new QSlider(Qt::Vertical);
 	aSlider = new QSlider(Qt::Horizontal);
 	doorSlider = new QSlider(Qt::Horizontal);
-	// mSlider = new QSlider(Qt::Horizontal);
+	nHorizontalSlider = new QSlider(Qt::Horizontal);
+	windowSlider = new QSlider(Qt::Horizontal);
 
+	sceneLayout->addWidget(nHorizontalSlider);
 	sceneLayout->addWidget(aSlider);
 	sceneLayout->addWidget(doorSlider);
-	// sceneLayout->addWidget(mSlider);
+	sceneLayout->addWidget(windowSlider);
 	// sceneLayout->addWidget(nSlider);
 
 	windowLayout->addLayout(sceneLayout);
@@ -50,14 +52,25 @@ OrthoDemoWindow::OrthoDemoWindow(QWidget *parent)
 	// connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateWheel()));
 
 	connect(aSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(zoomIn(int)));
+
+	doorSlider->setMinimum(-90);
+	doorSlider->setMaximum(90);
 	connect(doorSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(doorsOpen(int)));
-	// connect(nSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(updateAngleManual(int)));
+
+
+	windowSlider->setMinimum(0);
+	windowSlider->setMaximum(15);
+	connect(windowSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(windowTranslate(int)));
 
 	// connect(mSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(moveVehicle(int)));
 
 	nVerticalSlider->setMinimum(0);
 	nVerticalSlider->setMaximum(90);
 	connect(nVerticalSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(updateCameraYAngle(int)));
+
+	nHorizontalSlider->setMinimum(-90);
+	nHorizontalSlider->setMaximum(90);
+	connect(nHorizontalSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(updateCameraXAngle(int)));
 
 }
 

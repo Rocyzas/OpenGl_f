@@ -13,7 +13,8 @@ QT += widgets opengl gui
 
 LIBS += -lGLU -lglut -lGL
 # Input
-HEADERS += OrthoDemoWidget.h OrthoDemoWindow.h
+HEADERS += OrthoDemoWidget.h OrthoDemoWindow.h Image.h
 SOURCES += OrthoDemoMain.cpp \
            OrthoDemoWidget.cpp \
-           OrthoDemoWindow.cpp
+           OrthoDemoWindow.cpp \
+           Image.cpp

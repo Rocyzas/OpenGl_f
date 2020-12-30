@@ -39,7 +39,9 @@ class OrthoDemoWindow: public QWidget
 	QSlider *nSlider;
 	QSlider *mSlider;
 	QSlider *nVerticalSlider;
+	QSlider *nHorizontalSlider;
 	QSlider *doorSlider;
+	QSlider *windowSlider;
 
 	// resets all the interface elements
 	void ResetInterface();
