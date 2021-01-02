@@ -1196,22 +1196,6 @@ void VehicleWidget::renderPlane(const materialStruct& material){
   glEnd();
 }
 
-void VehicleWidget::renderPlaneP(){
-
-  GLfloat normals[][3] = { {0, 1, 0 }};
-  glNormal3fv(normals[0]);
-  glBegin(GL_POLYGON);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-100, -100, 0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(100, -100, 0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(100, 100, 0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(-100,  100, 0);
-  glEnd();
-}
-
 // Dialog opens on double mouse click event
 void VehicleWidget::mouseDoubleClickEvent(QMouseEvent* event )
 {

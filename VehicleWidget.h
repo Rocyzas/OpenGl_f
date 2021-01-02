@@ -45,12 +45,11 @@ class VehicleWidget: public QGLWidget{
 
 
 	private:
-		double _angle;
-		double _angleWhole; //for a whole car
 		bool _b_lighting;
 		bool _b_textures;
 		bool _b_obstacles;
-		double _time;
+		double _angle;
+		double _angleWhole; //for a whole car
 		double _scaler;
 		double _movement;
 		double _y_camera_angle;
@@ -59,6 +58,7 @@ class VehicleWidget: public QGLWidget{
 		int _doorsAngle;
 		double _windowTranslate;
 		double _bootTranslate;
+		double _time;
 
 		glm::vec3 normal3Points(const std::array<double, 9>&);
 
@@ -82,7 +82,6 @@ class VehicleWidget: public QGLWidget{
 		void vehicleStatWindows(float, const materialStruct&);
 
 		void renderPlane(const materialStruct&);
-		void renderPlaneP();
 
 		void obstacle(float, const materialStruct&, const materialStruct&);
 		void spawnObstacles(int,int, float,const materialStruct&,const materialStruct&);
@@ -90,7 +89,6 @@ class VehicleWidget: public QGLWidget{
 		void unify(double);
 
 // UI
-
 	  void LoadDialog(const Ui_Dialog&);
 	  void UnloadDialog(const Ui_Dialog&);
 		Ui_Dialog _ui;
