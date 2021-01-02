@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'dialog.ui'
 **
-** Created by: Qt User Interface Compiler version 5.14.1
+** Created by: Qt User Interface Compiler version 5.9.5
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -10,10 +10,13 @@
 #define UI_DIALOG_H
 
 #include <QtCore/QVariant>
+#include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
+#include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QDialog>
 #include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QHeaderView>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QTextEdit>
 
@@ -24,129 +27,75 @@ class Ui_Dialog
 public:
     QDialogButtonBox *buttonBox;
     QTextEdit *pos1;
-    QTextEdit *pos2;
-    QTextEdit *pos3;
     QTextEdit *at1;
-    QTextEdit *at2;
-    QTextEdit *at3;
     QTextEdit *up1;
-    QTextEdit *up2;
-    QTextEdit *up3;
     QLabel *label;
+    QLabel *label1;
     QLabel *label_2;
     QLabel *label_3;
     QLabel *label_4;
-    QLabel *label_5;
-    QTextEdit *xmin;
-    QTextEdit *xmax;
-    QTextEdit *ymin;
-    QTextEdit *zmin;
-    QTextEdit *zmax;
-    QTextEdit *ymax;
-    QLabel *label_6;
-    QLabel *label_7;
-    QLabel *label_8;
-    QLabel *label_9;
-    QLabel *label_10;
-    QLabel *label_11;
-    QCheckBox *blight;
     QLabel *label_12;
+    QCheckBox *blight;
+    QLabel *label_13;
+    QCheckBox *btextures;
+    QLabel *label_14;
+    QCheckBox *bobstacles;
 
     void setupUi(QDialog *Dialog)
     {
         if (Dialog->objectName().isEmpty())
-            Dialog->setObjectName(QString::fromUtf8("Dialog"));
-        Dialog->resize(696, 390);
+            Dialog->setObjectName(QStringLiteral("Dialog"));
+        Dialog->resize(500, 200);
         buttonBox = new QDialogButtonBox(Dialog);
-        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
-        buttonBox->setGeometry(QRect(590, 70, 81, 241));
+        buttonBox->setObjectName(QStringLiteral("buttonBox"));
+        buttonBox->setGeometry(QRect(380, 70, 81, 80));
         buttonBox->setOrientation(Qt::Vertical);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
         pos1 = new QTextEdit(Dialog);
-        pos1->setObjectName(QString::fromUtf8("pos1"));
-        pos1->setGeometry(QRect(50, 80, 121, 21));
-        pos2 = new QTextEdit(Dialog);
-        pos2->setObjectName(QString::fromUtf8("pos2"));
-        pos2->setGeometry(QRect(200, 80, 121, 21));
-        pos3 = new QTextEdit(Dialog);
-        pos3->setObjectName(QString::fromUtf8("pos3"));
-        pos3->setGeometry(QRect(360, 80, 111, 21));
+        pos1->setObjectName(QStringLiteral("pos1"));
+        pos1->setGeometry(QRect(70, 40, 121, 21));
         at1 = new QTextEdit(Dialog);
-        at1->setObjectName(QString::fromUtf8("at1"));
-        at1->setGeometry(QRect(50, 120, 121, 21));
-        at2 = new QTextEdit(Dialog);
-        at2->setObjectName(QString::fromUtf8("at2"));
-        at2->setGeometry(QRect(200, 120, 121, 21));
-        at3 = new QTextEdit(Dialog);
-        at3->setObjectName(QString::fromUtf8("at3"));
-        at3->setGeometry(QRect(360, 120, 111, 21));
+        at1->setObjectName(QStringLiteral("at1"));
+        at1->setGeometry(QRect(70, 80, 121, 21));
         up1 = new QTextEdit(Dialog);
-        up1->setObjectName(QString::fromUtf8("up1"));
-        up1->setGeometry(QRect(50, 160, 121, 21));
-        up2 = new QTextEdit(Dialog);
-        up2->setObjectName(QString::fromUtf8("up2"));
-        up2->setGeometry(QRect(200, 160, 121, 21));
-        up3 = new QTextEdit(Dialog);
-        up3->setObjectName(QString::fromUtf8("up3"));
-        up3->setGeometry(QRect(360, 160, 111, 21));
+        up1->setObjectName(QStringLiteral("up1"));
+        up1->setGeometry(QRect(70, 120, 121, 21));
         label = new QLabel(Dialog);
-        label->setObjectName(QString::fromUtf8("label"));
-        label->setGeometry(QRect(50, 60, 71, 16));
+        label->setObjectName(QStringLiteral("label"));
+        label->setGeometry(QRect(70, 20, 71, 16));
+        label1 = new QLabel(Dialog);
+        label1->setObjectName(QStringLiteral("label1"));
+        label1->setGeometry(QRect(200, 20, 71, 16));
         label_2 = new QLabel(Dialog);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setGeometry(QRect(10, 80, 58, 16));
+        label_2->setObjectName(QStringLiteral("label_2"));
+        label_2->setGeometry(QRect(10, 40, 58, 16));
         label_3 = new QLabel(Dialog);
-        label_3->setObjectName(QString::fromUtf8("label_3"));
-        label_3->setGeometry(QRect(10, 120, 58, 16));
+        label_3->setObjectName(QStringLiteral("label_3"));
+        label_3->setGeometry(QRect(10, 80, 58, 16));
         label_4 = new QLabel(Dialog);
-        label_4->setObjectName(QString::fromUtf8("label_4"));
-        label_4->setGeometry(QRect(10, 160, 58, 16));
-        label_5 = new QLabel(Dialog);
-        label_5->setObjectName(QString::fromUtf8("label_5"));
-        label_5->setGeometry(QRect(50, 190, 58, 16));
-        xmin = new QTextEdit(Dialog);
-        xmin->setObjectName(QString::fromUtf8("xmin"));
-        xmin->setGeometry(QRect(50, 230, 121, 21));
-        xmax = new QTextEdit(Dialog);
-        xmax->setObjectName(QString::fromUtf8("xmax"));
-        xmax->setGeometry(QRect(50, 280, 121, 21));
-        ymin = new QTextEdit(Dialog);
-        ymin->setObjectName(QString::fromUtf8("ymin"));
-        ymin->setGeometry(QRect(200, 230, 121, 21));
-        zmin = new QTextEdit(Dialog);
-        zmin->setObjectName(QString::fromUtf8("zmin"));
-        zmin->setGeometry(QRect(360, 230, 111, 21));
-        zmax = new QTextEdit(Dialog);
-        zmax->setObjectName(QString::fromUtf8("zmax"));
-        zmax->setGeometry(QRect(360, 280, 111, 21));
-        ymax = new QTextEdit(Dialog);
-        ymax->setObjectName(QString::fromUtf8("ymax"));
-        ymax->setGeometry(QRect(200, 280, 121, 21));
-        label_6 = new QLabel(Dialog);
-        label_6->setObjectName(QString::fromUtf8("label_6"));
-        label_6->setGeometry(QRect(50, 210, 58, 16));
-        label_7 = new QLabel(Dialog);
-        label_7->setObjectName(QString::fromUtf8("label_7"));
-        label_7->setGeometry(QRect(50, 260, 58, 16));
-        label_8 = new QLabel(Dialog);
-        label_8->setObjectName(QString::fromUtf8("label_8"));
-        label_8->setGeometry(QRect(200, 210, 58, 16));
-        label_9 = new QLabel(Dialog);
-        label_9->setObjectName(QString::fromUtf8("label_9"));
-        label_9->setGeometry(QRect(200, 260, 58, 16));
-        label_10 = new QLabel(Dialog);
-        label_10->setObjectName(QString::fromUtf8("label_10"));
-        label_10->setGeometry(QRect(360, 210, 58, 16));
-        label_11 = new QLabel(Dialog);
-        label_11->setObjectName(QString::fromUtf8("label_11"));
-        label_11->setGeometry(QRect(360, 260, 58, 16));
-        blight = new QCheckBox(Dialog);
-        blight->setObjectName(QString::fromUtf8("blight"));
-        blight->setGeometry(QRect(265, 330, 20, 20));
-        blight->setChecked(true);
+        label_4->setObjectName(QStringLiteral("label_4"));
+        label_4->setGeometry(QRect(10, 120, 58, 16));
         label_12 = new QLabel(Dialog);
-        label_12->setObjectName(QString::fromUtf8("label_12"));
-        label_12->setGeometry(QRect(170, 330, 81, 16));
+        label_12->setObjectName(QStringLiteral("label_12"));
+        label_12->setGeometry(QRect(200, 40, 120, 16));
+        blight = new QCheckBox(Dialog);
+        blight->setObjectName(QStringLiteral("blight"));
+        blight->setGeometry(QRect(330, 40, 20, 20));
+        blight->setChecked(true);
+        label_13 = new QLabel(Dialog);
+        label_13->setObjectName(QStringLiteral("label_13"));
+        label_13->setGeometry(QRect(200, 80, 120, 16));
+        btextures = new QCheckBox(Dialog);
+        btextures->setObjectName(QStringLiteral("btextures"));
+        btextures->setGeometry(QRect(330, 80, 20, 20));
+        btextures->setChecked(true);
+        label_14 = new QLabel(Dialog);
+        label_14->setObjectName(QStringLiteral("label_14"));
+        label_14->setGeometry(QRect(200, 120, 120, 16));
+        bobstacles = new QCheckBox(Dialog);
+        bobstacles->setObjectName(QStringLiteral("bobstacles"));
+        bobstacles->setGeometry(QRect(330, 120, 20, 20));
+        bobstacles->setChecked(true);
 
         retranslateUi(Dialog);
         QObject::connect(buttonBox, SIGNAL(accepted()), Dialog, SLOT(accept()));
@@ -157,20 +106,18 @@ public:
 
     void retranslateUi(QDialog *Dialog)
     {
-        Dialog->setWindowTitle(QCoreApplication::translate("Dialog", "Dialog", nullptr));
-        label->setText(QCoreApplication::translate("Dialog", "GluLookat", nullptr));
-        label_2->setText(QCoreApplication::translate("Dialog", "Pos", nullptr));
-        label_3->setText(QCoreApplication::translate("Dialog", "At", nullptr));
-        label_4->setText(QCoreApplication::translate("Dialog", "Up", nullptr));
-        label_5->setText(QCoreApplication::translate("Dialog", "GlOrtho", nullptr));
-        label_6->setText(QCoreApplication::translate("Dialog", "xmin", nullptr));
-        label_7->setText(QCoreApplication::translate("Dialog", "xmax", nullptr));
-        label_8->setText(QCoreApplication::translate("Dialog", "ymin", nullptr));
-        label_9->setText(QCoreApplication::translate("Dialog", "ymax", nullptr));
-        label_10->setText(QCoreApplication::translate("Dialog", "zmin", nullptr));
-        label_11->setText(QCoreApplication::translate("Dialog", "zmax", nullptr));
-        blight->setText(QCoreApplication::translate("Dialog", "CheckBox", nullptr));
-        label_12->setText(QCoreApplication::translate("Dialog", "Enable Light", nullptr));
+        Dialog->setWindowTitle(QApplication::translate("Dialog", "Dialog", Q_NULLPTR));
+        label->setText(QApplication::translate("Dialog", "Vehicle", Q_NULLPTR));
+        label1->setText(QApplication::translate("Dialog", "Scene", Q_NULLPTR));
+        label_2->setText(QApplication::translate("Dialog", "Speed", Q_NULLPTR));
+        label_3->setText(QApplication::translate("Dialog", "Radius", Q_NULLPTR));
+        label_4->setText(QApplication::translate("Dialog", "Width", Q_NULLPTR));
+        label_12->setText(QApplication::translate("Dialog", "Enable Light", Q_NULLPTR));
+        blight->setText(QApplication::translate("Dialog", "CheckBox", Q_NULLPTR));
+        label_13->setText(QApplication::translate("Dialog", "Enable Textures", Q_NULLPTR));
+        btextures->setText(QApplication::translate("Dialog", "CheckBox2", Q_NULLPTR));
+        label_14->setText(QApplication::translate("Dialog", "Enable Obstacles", Q_NULLPTR));
+        bobstacles->setText(QApplication::translate("Dialog", "CheckBox3", Q_NULLPTR));
     } // retranslateUi
 
 };

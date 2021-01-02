@@ -1,7 +1,7 @@
 #ifndef _IMAGE_
 #define _IMAGE_
 
-#include<string>
+#include <string>
 #include <QImage>
 #include <GL/glu.h>
 
