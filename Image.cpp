@@ -6,9 +6,9 @@
 Image::Image(const std::string& file_name)
 {
   p_qimage = new QImage(QString(file_name.c_str()));
-  
+
   _width  = p_qimage->width();
-  _height = p_qimage->height(); 
+  _height = p_qimage->height();
 
   _image = new GLubyte[_width*_height*3];
 

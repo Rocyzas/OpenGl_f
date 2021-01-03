@@ -27,7 +27,7 @@ class VehicleWindow: public QWidget{
 
 	QTimer *ptimer;
 
-	VehicleWidget *cubeWidget;
+	VehicleWidget *vWidget;
 
 	// labels for sliders
 	QLabel *label1;

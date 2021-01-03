@@ -7,13 +7,14 @@
 #include <QObject>
 #include <iostream>
 
-#include "Image.h"
-#include "ui_dialog.h"
-
 struct materialStruct;
 
 const unsigned int N_COLOR   = 3;
 
+
+#include "Drawings.h"
+#include "Image.h"
+#include "ui_dialog.h"
 
 class VehicleWidget: public QGLWidget{
 
@@ -58,23 +59,23 @@ class VehicleWidget: public QGLWidget{
 		int _doorsAngle;
 		double _windowTranslate;
 		double _bootTranslate;
-		double _time;
+
 
 		glm::vec3 normal3Points(const std::array<double, 9>&);
 
 		Image   _imageMarc;
 		Image   _imageRaceTrack;
 		Image   _imageMap;
-	  QImage* p_qimage;
 
-		void cylinder(float, float, const materialStruct&);
 		void drawWheel(float, float, float, float, const materialStruct&, const materialStruct&);
 		void sphere(const materialStruct&);
 		void wheelAxes(float, float , float, float);
+		void spehereForTexture(double, int, int);
 
 		void vehicleBootTop(double, float, const materialStruct&);
 		void vehicleBootBottom(float, const materialStruct&);
 		void vehicleRoof(float, const materialStruct&);
+		void vehicleWheelBumbers(float, const materialStruct&);
 		void vehicleSideGround(float, const materialStruct&);
 		void vehicleDoors(float, const materialStruct&);
 		void vehicleSideUper(float, const materialStruct&);
@@ -82,14 +83,14 @@ class VehicleWidget: public QGLWidget{
 		void vehicleStatWindows(float, const materialStruct&);
 
 		void renderPlane(const materialStruct&);
-
+		void makeLight(float, float, float, float, const materialStruct&);
 		void obstacle(float, const materialStruct&, const materialStruct&);
 		void spawnObstacles(int,int, float,const materialStruct&,const materialStruct&);
 
-		void unify(double);
+		void unifyVehicle();
 
 // UI
-	  void LoadDialog(const Ui_Dialog&);
+	  void LoadDialog();
 	  void UnloadDialog(const Ui_Dialog&);
 		Ui_Dialog _ui;
 		void mouseDoubleClickEvent(QMouseEvent* event);

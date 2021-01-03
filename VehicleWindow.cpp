@@ -10,8 +10,8 @@ VehicleWindow::VehicleWindow(QWidget *parent)
 	sceneLayout = new QBoxLayout(QBoxLayout::TopToBottom, this);
 
 	// create main widget
-	cubeWidget = new VehicleWidget(this);
-	sceneLayout->addWidget(cubeWidget);
+	vWidget = new VehicleWidget(this);
+	sceneLayout->addWidget(vWidget);
 
 	// create sliders
 	nVerticalSlider = new QSlider(Qt::Vertical);
@@ -68,37 +68,36 @@ VehicleWindow::VehicleWindow(QWidget *parent)
 	ptimer = new QTimer(this);
 	ptimer->start(20);
 
-	connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateAngle()));
-	// connect(ptimer, SIGNAL(timeout()),  cubeWidget, SLOT(updateWheel()));
+	connect(ptimer, SIGNAL(timeout()),  vWidget, SLOT(updateAngle()));
 
-	connect(zoomSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(zoomIn(int)));
+	zoomSlider->setMinimum(-7);
+	zoomSlider->setMaximum(40);
+	connect(zoomSlider, SIGNAL(valueChanged(int)),  vWidget, SLOT(zoomIn(int)));
 
 	doorSlider->setMinimum(0);
 	doorSlider->setMaximum(60);
-	connect(doorSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(doorsOpen(int)));
+	connect(doorSlider, SIGNAL(valueChanged(int)), vWidget, SLOT(doorsOpen(int)));
 
 
 	windowSlider->setMinimum(0);
 	windowSlider->setMaximum(15);
-	connect(windowSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(windowTranslate(int)));
-
-	// connect(mSlider, SIGNAL(valueChanged(int)), cubeWidget, SLOT(moveVehicle(int)));
+	connect(windowSlider, SIGNAL(valueChanged(int)), vWidget, SLOT(windowTranslate(int)));
 
 	nVerticalSlider->setMinimum(0);
 	nVerticalSlider->setMaximum(90);
-	connect(nVerticalSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(updateCameraYAngle(int)));
+	connect(nVerticalSlider, SIGNAL(valueChanged(int)),  vWidget, SLOT(updateCameraYAngle(int)));
 
 	nHorizontalSlider->setMinimum(-90);
 	nHorizontalSlider->setMaximum(90);
-	connect(nHorizontalSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(updateCameraXAngle(int)));
+	connect(nHorizontalSlider, SIGNAL(valueChanged(int)),  vWidget, SLOT(updateCameraXAngle(int)));
 
 	bootSlider->setMinimum(0);
 	bootSlider->setMaximum(50);
-	connect(bootSlider, SIGNAL(valueChanged(int)),  cubeWidget, SLOT(openBoot(int)));
+	connect(bootSlider, SIGNAL(valueChanged(int)),  vWidget, SLOT(openBoot(int)));
 }
 
 VehicleWindow::~VehicleWindow(){
-	delete cubeWidget;
+	delete vWidget;
 
 	delete vertLayout;
 	delete windowLayout;
@@ -127,6 +126,6 @@ VehicleWindow::~VehicleWindow(){
 // resets all the interface elements
 void VehicleWindow::ResetInterface(){
 	// now force refresh
-	cubeWidget->update();
+	vWidget->update();
 	update();
 }
