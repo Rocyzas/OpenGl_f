@@ -28,6 +28,8 @@ class VehicleWidget: public QGLWidget{
 	void updateCameraYAngle(int);
 	void updateCameraXAngle(int);
 	void updateAngle();
+	void updateAngleLight();
+	void updateAngleEarth();
 	void zoomIn(int);
 	void doorsOpen(int);
 	void windowTranslate(int);
@@ -50,6 +52,8 @@ class VehicleWidget: public QGLWidget{
 		bool _b_textures;
 		bool _b_obstacles;
 		double _angle;
+		double _rotateLight;
+		double _rotateEarth;
 		double _angleWhole; //for a whole car
 		double _scaler;
 		double _movement;
@@ -70,7 +74,7 @@ class VehicleWidget: public QGLWidget{
 		void drawWheel(float, float, float, float, const materialStruct&, const materialStruct&);
 		void sphere(const materialStruct&);
 		void wheelAxes(float, float , float, float);
-		void spehereForTexture(double, int, int);
+		void sphereWithTexture();
 
 		void vehicleBootTop(double, float, const materialStruct&);
 		void vehicleBootBottom(float, const materialStruct&);

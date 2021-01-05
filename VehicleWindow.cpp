@@ -68,7 +68,9 @@ VehicleWindow::VehicleWindow(QWidget *parent)
 	ptimer = new QTimer(this);
 	ptimer->start(20);
 
-	connect(ptimer, SIGNAL(timeout()),  vWidget, SLOT(updateAngle()));
+	connect(ptimer, SIGNAL(timeout()),  vWidget, SLOT(updateAngle())); //vehicle
+	connect(ptimer, SIGNAL(timeout()),  vWidget, SLOT(updateAngleLight())); //light
+	connect(ptimer, SIGNAL(timeout()),  vWidget, SLOT(updateAngleEarth())); //earth
 
 	zoomSlider->setMinimum(-7);
 	zoomSlider->setMaximum(40);

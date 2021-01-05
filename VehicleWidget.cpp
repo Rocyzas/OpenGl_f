@@ -13,7 +13,7 @@ static const int StartingPosition = 80;
 static const float PI = 3.1415926535;
 
 float vehicleWidth=8.14;
-float speed = 0.4;
+float speed = 0.7;
 float TotalDistance = 0;
 GLfloat radius = 50;
 GLUquadric* qobj;
@@ -32,6 +32,8 @@ VehicleWidget::VehicleWidget(QWidget *parent)
     _windowTranslate(0),
     _bootTranslate(0),
     _movement(StartingPosition),
+    _rotateLight(0),
+    _rotateEarth(0),
     _imageMarc("textures/Marc.ppm"),
     _imageRaceTrack("textures/race.png"),
     _imageMap("textures/Map.ppm")
@@ -59,6 +61,20 @@ void VehicleWidget::updateAngle(){
   this->repaint();
 }
 
+//Rotating Light
+void VehicleWidget::updateAngleLight(){
+  //rotating slow and in different direction than earth
+  _rotateLight -=0.5;
+  this->repaint();
+}
+
+//Rotating Earth
+void VehicleWidget::updateAngleEarth(){
+  //rotating slower than light but in the same direction than vehicle
+  _rotateEarth +=0.25;
+  this->repaint();
+}
+
 void VehicleWidget::doorsOpen(int d){
   _doorsAngle = d;
   this->repaint();
@@ -66,7 +82,6 @@ void VehicleWidget::doorsOpen(int d){
 
 void VehicleWidget::zoomIn(int d){
   _scaler = 1 + 0.1*d;//gradual zoom out/in
-  std::cout<<_scaler<<" "<<d<<std::endl;
   this->repaint();
 }
 
@@ -143,8 +158,8 @@ static materialStruct redShinyMaterials = {
 // called when OpenGL context is set up
 void VehicleWidget::initializeGL()
 	{
-	// set the widget background colour
-	glClearColor(0.3, 0.3, 0.3, 0.0);
+	// set the widget background colour as BLACK
+	glClearColor(0, 0, 0, 0.0);
 
   qobj = gluNewQuadric();
   gluQuadricNormals(qobj, GLU_SMOOTH);
@@ -188,52 +203,22 @@ void VehicleWidget::drawWheel(float inner, float outer, float nsides, float ring
   glutSolidTorus(inner, outer, nsides, rings);
 }
 
-void VehicleWidget::spehereForTexture(double r, int lats, int longs){
+void VehicleWidget::sphereWithTexture(){
 
-  int i, j;
-  if(_b_textures){
+    GLUquadricObj *gobj=gluNewQuadric();
+
+    gluQuadricDrawStyle(gobj,GLU_FILL);
+    gluQuadricNormals(gobj,GLU_SMOOTH);
+    gluQuadricTexture(gobj,GL_TRUE);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
+
     glEnable(GL_TEXTURE_2D);
-  }
-  else{
+    gluSphere(gobj,0.75f,32,32);
+
+    glFinish();
     glDisable(GL_TEXTURE_2D);
-  }
-
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
-
-
-    int halfLats = lats / 2;
-    for(i = 0; i <= lats; i++)
-    {
-        double lat0 = M_PI * (-0.5 + (double) (i - 1) / lats);
-        double z0 = sin(lat0);
-        double zr0 = cos(lat0);
-
-        double lat1 = M_PI * (-0.5 + (double) i / lats);
-        double z1 = sin(lat1);
-        double zr1 = cos(lat1);
-
-        glBegin(GL_QUAD_STRIP);
-        for(j = 0; j <= longs; j++)
-        {
-          double lng = 2 * M_PI * (double) (j - 1) / longs;
-           double x = cos(lng);
-           double y = sin(lng);
-
-           double s1, s2, t;
-           s1 = ((double) i) / halfLats;
-           s2 = ((double) i + 1) / halfLats;
-           t = ((double) j) / longs;
-
-           glTexCoord2f(s1, t);
-           glNormal3d(x * zr0, y * zr0, z0);
-           glVertex3d(x * zr0, y * zr0, z0);
-
-           glTexCoord2f(s2, t);
-           glNormal3d(x * zr1, y * zr1, z1);
-           glVertex3d(x * zr1, y * zr1, z1);
-        }
-        glEnd();
-    }
+    gluDeleteQuadric(gobj);
 }
 
 // Function to calculate normals of a plane given three points
@@ -961,7 +946,9 @@ void VehicleWidget::unifyVehicle(){
     glRotatef(_x_camera_angle, 0., 1., 0.); //horizontal widget
     glRotatef(_angleWhole, 0., 1., 0.); //Car movement
 
+
     glScalef(_scaler,_scaler,_scaler);//scaling so it looks like zooming
+
     glTranslatef(-radius-0.1*radius, 0, 0);//move vehicle in circle
 
     glRotatef(70+radius/10, 0,1,0);//Rotate the car itself
@@ -1045,115 +1032,6 @@ void VehicleWidget::makeLight(float x, float y, float z, float w, const material
   glPopMatrix();
 }
 
-// called every time the widget needs painting
-void VehicleWidget::paintGL(){
-
-	// clear the widget
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glEnable(GL_NORMALIZE);
-
-  // glShadeModel(GL_FLAT);
-	glMatrixMode(GL_MODELVIEW);
- 	glEnable(GL_DEPTH_TEST);
-
-    glRotatef(_y_camera_angle, 1., 0., 0.); //vertical widget
-    glRotatef(_x_camera_angle, 0, 1., 0.); //Horizontal widget
-
-    glScalef(_scaler,_scaler,_scaler);//zooming in/out
-
-    if(_b_lighting)makeLight(30,50,0,0.2,brassMaterials);
-    else{  glDisable(GL_LIGHTING);}
-
-
-  /* For an appropriate scaling of a plane and racetrack texture
-      using https://www.dcode.fr/function-equation-finder*/
-  float raceTrackScaler = 0.0357506 * pow(radius,0.827275) - 0.11963;
-
-    /* The bottom texture(plain black) and only visible when lighting is on
-      because if lghting is off and view is from the top nothing else apart plane is visible*/
-    if(_b_lighting){
-      glTranslatef(0,-4,0);
-      glPushMatrix();
-        if(radius>65)
-          glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
-        glTranslatef(0,-0.01,0);
-        glRotatef(90, 1, 0, 0);
-        glRotatef(180, 0, 0, 1);
-        this->renderPlane(blackMaterial);
-      glPopMatrix();
-    }
-
-  if(_b_textures){
-    // The Racetrack texture
-    glPushMatrix();
-    //since the texture is not fully symetrical circle, i have to translate it and scale it manually
-      glTranslatef(0,0,-5);
-      if(radius<120)
-        glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
-      else glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
-      glRotatef(180, 0, 1, 0);
-      glRotatef(90, 1, 0, 0);
-      glRotatef(180, 0, 0, 1);
-
-      glEnable(GL_TEXTURE_2D);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
-      this->renderPlane(whiteShinyMaterials);
-      glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
-
-    // The walls
-    glPushMatrix();
-
-      if(radius>64){
-        glTranslatef(0,50,-100*raceTrackScaler+5);
-        glScalef(raceTrackScaler,0.5,raceTrackScaler);
-      }
-      else {
-        glTranslatef(0,50,-100);
-        glScalef(1,0.5,1);
-      }
-      glPushMatrix();//front
-        glEnable(GL_TEXTURE_2D);
-          glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
-          this->renderPlane(whiteShinyMaterials);
-        glDisable(GL_TEXTURE_2D);
-      glPopMatrix();
-      glPushMatrix();//left
-        glTranslatef(-100, 0, 95);
-        glRotatef(90, 0, 1, 0);
-        glEnable(GL_TEXTURE_2D);
-          glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
-          this->renderPlane(whiteShinyMaterials);
-        glDisable(GL_TEXTURE_2D);
-      glPopMatrix();
-      glPushMatrix();//right
-        glTranslatef(100, 0, 95);
-        glRotatef(270, 0, 1, 0);
-        glEnable(GL_TEXTURE_2D);
-          glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
-          this->renderPlane(whiteShinyMaterials);
-        glDisable(GL_TEXTURE_2D);
-      glPopMatrix();
-    glPopMatrix();
-  }
-
-  if(_b_obstacles){
-    //number of inner obstacles, number of outer obstacles, height of obstacle
-    int inner = radius/6;
-    int outter= radius/4;
-    spawnObstacles(inner, outter, 2, redShinyMaterials, brassMaterials); //set min max(40)
-  }
-
-  	glLoadIdentity();
-    //setting camera, target and face
-    gluLookAt(50,50,0,  0,0,0,  0,0,1);
-
-    unifyVehicle();
-
-
-	glFlush();
-}
-
 void VehicleWidget::obstacle(float size,const materialStruct& material1, const materialStruct& material2){
 
   glPushMatrix();
@@ -1191,15 +1069,16 @@ void VehicleWidget::spawnObstacles(int inN, int outN, float size, const material
     glPopMatrix();
   }
 
-  //inner obstacles
-  for(int i=0; i<inN; i++){
-   glRotatef(360.0/inN,0,1,0);
-    glPushMatrix();
-    // sbtracting only 16.28(the width of the vehicle because it's rotation is centered at the front)
-      glTranslatef(radius-2*vehicleWidth, 0, 0);
-      obstacle(size, material1, material2);
-    glPopMatrix();
-  }
+  //TODO: uncomment for inner obstacles
+  // inner obstacles
+  // for(int i=0; i<inN; i++){
+  //  glRotatef(360.0/inN,0,1,0);
+  //   glPushMatrix();
+  //   // sbtracting only 16.28(the width of the vehicle because it's rotation is centered at the front)
+  //     glTranslatef(radius-2*vehicleWidth, 0, 0);
+  //     obstacle(size, material1, material2);
+  //   glPopMatrix();
+  // }
 }
 
 //Flat plane with a texture
@@ -1222,6 +1101,93 @@ void VehicleWidget::renderPlane(const materialStruct& material){
     glTexCoord2f(0.0, 1.0);
     glVertex3f(-100,  100, 0);
   glEnd();
+}
+
+// called every time the widget needs painting
+void VehicleWidget::paintGL(){
+
+	// clear the widget
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  glEnable(GL_NORMALIZE);
+
+  // glShadeModel(GL_FLAT);
+	glMatrixMode(GL_MODELVIEW);
+ 	glEnable(GL_DEPTH_TEST);
+
+    glRotatef(_y_camera_angle, 1., 0., 0.); //vertical widget
+    glRotatef(_x_camera_angle, 0, 1., 0.); //Horizontal widget
+
+    glScalef(_scaler,_scaler,_scaler);//zooming in/out
+
+    //making light responsive to the radius
+    glPushMatrix();
+      glRotatef(_rotateLight, 0,1,0);
+      if(_b_lighting)makeLight(0.6*radius,radius,0,0.2,brassMaterials);
+      else{  glDisable(GL_LIGHTING);}
+    glPopMatrix();
+
+
+  /* For an appropriate scaling of a plane and racetrack texture
+      using https://www.dcode.fr/function-equation-finder*/
+  float raceTrackScaler = 0.0357506 * pow(radius,0.827275) - 0.11963;
+
+    /* The bottom texture(plain black) and only visible when lighting is on
+      because if lghting is off and view is from the top nothing else apart plane is visible*/
+    if(_b_lighting){
+      glTranslatef(0,-4,0);
+      glPushMatrix();
+        if(radius>65)
+          glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
+        glTranslatef(0,-0.01,0);
+        glRotatef(90, 1, 0, 0);
+        glRotatef(180, 0, 0, 1);
+        this->renderPlane(blackMaterial);
+      glPopMatrix();
+    }
+
+//GLOBE texture and RACETRACK texture
+  if(_b_textures){
+    // The Racetrack texture
+    glPushMatrix();
+    //since the texture is not fully symetrical circle, i have to translate it and scale it manually
+      glTranslatef(0,0,-5);
+      if(radius<120)
+        glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
+      else glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
+      glRotatef(180, 0, 1, 0);
+      glRotatef(90, 1, 0, 0);
+      glRotatef(180, 0, 0, 1);
+
+      glEnable(GL_TEXTURE_2D);
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
+      this->renderPlane(whiteShinyMaterials);
+      glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
+
+    //The Globe
+    glPushMatrix();
+      glScalef(radius,radius,radius);
+      glRotatef(_rotateEarth, 0, 1, 0);
+      glRotatef(90, 1,0,0);
+      glRotatef(180, 0,1,0);
+      this->sphereWithTexture();
+    glPopMatrix();
+  }
+
+  if(_b_obstacles){
+    //number of inner obstacles, number of outer obstacles, height of obstacle
+    int inner = radius/6;
+    int outter= radius/4;
+    spawnObstacles(inner, outter, 2, redShinyMaterials, brassMaterials); //set min max(40)
+  }
+
+  	glLoadIdentity();
+    //setting camera, target and face
+    gluLookAt(50,50,0,  0,0,0,  0,0,1);
+
+    unifyVehicle();
+
+	glFlush();
 }
 
 // Dialog opens on double mouse click event
@@ -1251,7 +1217,7 @@ void VehicleWidget::UnloadDialog(const Ui_Dialog& dialog)
   if(dialog.pos1->toPlainText().toFloat()>=0 && dialog.pos1->toPlainText().toFloat()<=40){
     speed = dialog.pos1->toPlainText().toFloat();
   }
-  if(dialog.at1->toPlainText().toFloat()>=40 && dialog.at1->toPlainText().toFloat()<=1500){
+  if(dialog.at1->toPlainText().toFloat()>=50 && dialog.at1->toPlainText().toFloat()<=200){
       radius = dialog.at1->toPlainText().toFloat();
   }
 
