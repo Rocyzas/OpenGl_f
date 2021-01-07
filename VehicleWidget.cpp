@@ -93,7 +93,6 @@ void VehicleWidget::openBoot(int d){
   this->repaint();
 }
 
-
 // Setting up material properties
 typedef struct materialStruct {
   GLfloat ambient[4];
@@ -285,6 +284,7 @@ void VehicleWidget::makeLight(float x, float y, float z, float w, const material
   //makes light to visualise better
   glPushMatrix();
     glTranslatef(x,y,z);
+    glRotatef(_rotateLight*2, 1, 1, 1);
     glScalef(5,5,5); //constant size
     drawDodecahedron(material);
   glPopMatrix();
