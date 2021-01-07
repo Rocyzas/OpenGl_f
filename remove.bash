@@ -5,6 +5,6 @@
 touch $filename
 # Check the file is exists or not
 if [ -f $filename ]; then
-   rm moc_* *.o Makefile TargetVehicle
+   rm moc_* *.o Makefile
    echo "Files removed"
 fi
