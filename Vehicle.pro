@@ -13,9 +13,8 @@ QT += widgets opengl gui
 
 LIBS += -lGLU -lglut -lGL
 # Input
-HEADERS += VehicleWidget.h VehicleWindow.h Image.h Drawings.h
+HEADERS += VehicleWidget.h VehicleWindow.h Image.h
 SOURCES += Main.cpp \
            VehicleWidget.cpp \
            VehicleWindow.cpp \
-           Image.cpp \
-           Drawings.cpp
+           Image.cpp

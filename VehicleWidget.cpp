@@ -1,13 +1,13 @@
-#include <GL/glut.h>
 #include <QGLWidget>
 #include <QDebug>
 #include <iostream>
 #include <cmath>
-#include "VehicleWidget.h"
-#include "Drawings.h"
+
+#include <GL/glut.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <array>
+#include "VehicleWidget.h"
+
 
 static const int StartingPosition = 80;
 static const float PI = 3.1415926535;
@@ -25,15 +25,13 @@ VehicleWidget::VehicleWidget(QWidget *parent)
     _b_lighting(true),
     _b_textures(true),
     _b_obstacles(true),
-    _angle(0.0),
     _scaler(1.0),
-    _wheelRotate(0),
+    _wheelRotate(0.0),
     _doorsAngle(0),
-    _windowTranslate(0),
-    _bootTranslate(0),
-    _movement(StartingPosition),
-    _rotateLight(0),
-    _rotateEarth(0),
+    _windowTranslate(0.0),
+    _bootTranslate(0.0),
+    _rotateLight(0.0),
+    _rotateEarth(0.0),
     _imageMarc("textures/Marc.ppm"),
     _imageRaceTrack("textures/race.png"),
     _imageMap("textures/Map.ppm")
@@ -54,10 +52,10 @@ void VehicleWidget::updateCameraXAngle(int angle){
 
 // Wheel spinning and whole vehicle move
 void VehicleWidget::updateAngle(){
-  float Wheelsize = 1;
+  float Wheelsize = 3;
   TotalDistance += speed;
   _angleWhole = (TotalDistance);
-  _wheelRotate += 2*speed*(2*PI*Wheelsize);
+  _wheelRotate += speed*PI*Wheelsize*(radius*2*PI/(100*PI));
   this->repaint();
 }
 
@@ -155,70 +153,170 @@ static materialStruct redShinyMaterials = {
   100.0
 };
 
-// called when OpenGL context is set up
-void VehicleWidget::initializeGL()
-	{
-	// set the widget background colour as BLACK
-	glClearColor(0, 0, 0, 0.0);
+void VehicleWidget::drawDodecahedron(const materialStruct& material){
 
-  qobj = gluNewQuadric();
-  gluQuadricNormals(qobj, GLU_SMOOTH);
+  float g = 1.61803398875; //golden ratio
+  float og = 1/g; //1 over golden ratio
 
-	glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  glOrtho(-100.,100.,-100.,100.,-600.,600);
+  glPushMatrix();
+
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
+
+  glNormal3fv(glm::value_ptr(normal3Points({-og, -g, 0, og, -g, 0, 1, -1, 1})));
+    glBegin(GL_POLYGON);
+      glVertex3f(-og, -g, 0);
+      glVertex3f(og, -g, 0);
+      glVertex3f(1, -1, 1);
+      glVertex3f(0, -og, g);
+      glVertex3f(-1,-1,1);
+    glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({0, -og, g, 1, -1, 1, g, 0, og})));
+    glBegin(GL_POLYGON);
+      glVertex3f(0, -og, g);
+      glVertex3f(1,-1,1);
+      glVertex3f(g, 0, og);
+      glVertex3f(1,1,1);
+      glVertex3f(0, og, g);
+    glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({1, -1, 1, og, -g, 0, 1, -1, -1})));
+    glBegin(GL_POLYGON);
+      glVertex3f(1, -1, 1);
+      glVertex3f(og, -g, 0);
+      glVertex3f(1, -1, -1);
+      glVertex3f(g, 0, -og);
+      glVertex3f(g, 0, og);
+    glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({-og, -g, 0, -1,-1,-1, 0, -og, -g})));
+    glBegin(GL_POLYGON);
+      glVertex3f(-og, -g, 0);
+      glVertex3f(-1,-1,-1);
+      glVertex3f(0, -og, -g);
+      glVertex3f(1, -1, -1);
+      glVertex3f(og, -g, 0);
+    glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({-g, 0, og, -g, 0, -og, -1,-1,-1})));
+    glBegin(GL_POLYGON);
+      glVertex3f(-g, 0, og);
+      glVertex3f(-g, 0, -og);
+      glVertex3f(-1,-1,-1);
+      glVertex3f(-og, -g, 0);
+      glVertex3f(-1,-1,1);
+    glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({-1,-1,1, 0,-og, g, 0, og, g})));
+    glBegin(GL_POLYGON);
+      glVertex3f(-1,-1,1);
+      glVertex3f(0,-og, g);
+      glVertex3f(0, og, g);
+      glVertex3f(-1,1,1);
+      glVertex3f(-g, 0, og);
+    glEnd();
+    glNormal3fv(glm::value_ptr(normal3Points({0, og, g, 1,1,1, og, g, 0})));
+    glBegin(GL_POLYGON);
+      glVertex3f(0, og, g);
+      glVertex3f(1,1,1);
+      glVertex3f(og, g, 0);
+      glVertex3f(-og, g, 0);
+      glVertex3f(-1,1,1);
+    glEnd();
+    glEnd();
+    glNormal3fv(glm::value_ptr(normal3Points({g, 0, og, g, 0, -og, 1,1,-1})));
+    glBegin(GL_POLYGON);
+      glVertex3f(g, 0, og);
+      glVertex3f(g, 0, -og);
+      glVertex3f(1,1,-1);
+      glVertex3f(og, g, 0);
+      glVertex3f(1,1,1);
+    glEnd();
+    glNormal3fv(glm::value_ptr(normal3Points({0, og, -g, 1,1,-1, og, g, 0})));
+      glBegin(GL_POLYGON);
+        glVertex3f(-og, g, 0);
+        glVertex3f(og, g, 0);
+        glVertex3f(1,1,-1);
+        glVertex3f(0, og, -g);
+        glVertex3f(-1,1,-1);
+      glEnd();
+
+    glNormal3fv(glm::value_ptr(normal3Points({g, 0, -og, 1,-1,-1,0, -og, -g})));
+    glBegin(GL_POLYGON);
+      glVertex3f(g, 0, -og);
+      glVertex3f(1, -1, -1);
+      glVertex3f(0, -og, -g);
+      glVertex3f(0, og, -g);
+      glVertex3f(1,1,-1);
+    glEnd();
+
+      glNormal3fv(glm::value_ptr(normal3Points({0, -og, -g, -1,-1,-1, -g, 0, -og})));
+    glBegin(GL_POLYGON);
+      glVertex3f(0, -og, -g);
+      glVertex3f(-1,-1,-1);
+      glVertex3f(-g, 0, -og);
+      glVertex3f(-1,1,-1);
+      glVertex3f(0, og, -g);
+    glEnd();
+    glNormal3fv(glm::value_ptr(normal3Points({-1, 1, 1, -og, g, 0, -1,1,-1})));
+    glBegin(GL_POLYGON);
+      glVertex3f(-1, 1, 1);
+      glVertex3f(-og, g, 0);
+      glVertex3f(-1,1,-1);
+      glVertex3f(-g, 0, -og);
+      glVertex3f(-g, 0, og);
+    glEnd();
+
+  glPopMatrix();
+
 }
 
+void VehicleWidget::makeLight(float x, float y, float z, float w, const materialStruct& material){
+  // setting light position in the scene
+  GLfloat light_pos[] = {x,y,z, w};
+  glEnable(GL_LIGHTING); // enable lighting in general
+  glEnable(GL_LIGHT0);   // each light source must also be enabled
+  glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
-// called every time the widget is resized
-void VehicleWidget::resizeGL(int w, int h){
-  glViewport(0, 0, w, h);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-
-  //Textures
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  // The Sphere depicting where the light is comming from
+  //makes light to visualise better
+  glPushMatrix();
+    glTranslatef(x,y,z);
+    glScalef(5,5,5); //constant size
+    drawDodecahedron(material);
+  glPopMatrix();
 }
 
-void VehicleWidget::drawWheel(float inner, float outer, float nsides, float rings, const materialStruct& material1, const materialStruct& material2){
-
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material1.ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material1.diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR,   material1.specular);
-  glMaterialf(GL_FRONT, GL_SHININESS,   material1.shininess);
-
-  // glutSolidTorus(inner, outer, nsides, rings);
-  glutSolidTorus(inner/2, outer*2, 16, 16);
-
-  // radius, slices, stacks
-  glutSolidSphere((outer-inner)*2, 36, 32);
-
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material2.ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material2.diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR,   material2.specular);
-  glMaterialf(GL_FRONT, GL_SHININESS,   material2.shininess);
-  glutSolidTorus(inner, outer, nsides, rings);
-}
-
-void VehicleWidget::sphereWithTexture(){
-
-    GLUquadricObj *gobj=gluNewQuadric();
-
-    gluQuadricDrawStyle(gobj,GLU_FILL);
-    gluQuadricNormals(gobj,GLU_SMOOTH);
-    gluQuadricTexture(gobj,GL_TRUE);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
+void VehicleWidget::drawTextures(float raceTrackScaler){
+  // The Racetrack texture
+  glPushMatrix();
+  //since the texture is not fully symetrical circle, i have to translate it and scale it manually
+    glTranslatef(0,0,-5);
+    if(radius<120)
+      glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
+    else glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
+    glRotatef(180, 0, 1, 0);
+    glRotatef(90, 1, 0, 0);
+    glRotatef(180, 0, 0, 1);
 
     glEnable(GL_TEXTURE_2D);
-    gluSphere(gobj,0.75f,32,32);
-
-    glFinish();
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
+    this->renderPlane(whiteShinyMaterials);
     glDisable(GL_TEXTURE_2D);
-    gluDeleteQuadric(gobj);
+  glPopMatrix();
+
+  //The Globe
+  glPushMatrix();
+    glScalef(radius,radius,radius);
+
+    glRotatef(_rotateEarth, 0, 1, 0);
+    glRotatef(90, 1,0,0);
+    glRotatef(180, 0,1,0);
+    this->sphereWithTexture();
+  glPopMatrix();
 }
 
 // Function to calculate normals of a plane given three points
@@ -251,6 +349,115 @@ glm::vec3 VehicleWidget::normal3Points(const std::array<double, 9>& params){
 
   return glm::normalize(glm::cross(v2 - v1, v3 - v2));
   }
+}
+
+void VehicleWidget::sphereWithTexture(){
+
+    GLUquadricObj *gobj=gluNewQuadric();
+
+    gluQuadricDrawStyle(gobj,GLU_FILL);
+    gluQuadricNormals(gobj,GLU_SMOOTH);
+    gluQuadricTexture(gobj,GL_TRUE);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
+
+    glEnable(GL_TEXTURE_2D);
+    gluSphere(gobj,0.75f,32,32);
+
+    glFinish();
+    glDisable(GL_TEXTURE_2D);
+    gluDeleteQuadric(gobj);
+}
+
+void VehicleWidget::obstacle(float size,const materialStruct& material1, const materialStruct& material2){
+
+  glPushMatrix();
+    glRotatef(-90,1,0,0);
+
+    glPushMatrix();
+      glMaterialfv(GL_FRONT, GL_AMBIENT,    material1.ambient);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE,    material1.diffuse);
+      glMaterialfv(GL_FRONT, GL_SPECULAR,   material1.specular);
+      glMaterialf(GL_FRONT, GL_SHININESS,   material1.shininess);
+      glutSolidTorus(size/4, size, 16,8);
+      glTranslatef(0,0,size);
+      // radius, slices, stacks
+      glutSolidSphere(size/2, 16,2);
+    glPopMatrix();
+
+    glMaterialfv(GL_FRONT, GL_AMBIENT,    material2.ambient);
+    glMaterialfv(GL_FRONT, GL_DIFFUSE,    material2.diffuse);
+    glMaterialfv(GL_FRONT, GL_SPECULAR,   material2.specular);
+    glMaterialf(GL_FRONT, GL_SHININESS,   material2.shininess);
+    //obj, base(bottom), base(top), length(height), slices, stacks
+    gluCylinder(qobj, size, size/2, size, 10, 1);
+  glPopMatrix();
+}
+
+void VehicleWidget::spawnObstacles(int inN, int outN, float size, const materialStruct& material1, const materialStruct& material2){
+
+  //outter obstacles
+  for(int i=0; i<outN; i++){
+   glRotatef(360.0/outN,0,1,0);
+    glPushMatrix();
+    // adding additional 30 because of the vehicle lenght
+      glTranslatef(radius+2*vehicleWidth+radius/8, 0, 0);
+      obstacle(size, material1, material2);
+    glPopMatrix();
+  }
+
+  //uncomment for inner obstacles
+  // inner obstacles
+  // for(int i=0; i<inN; i++){
+  //  glRotatef(360.0/inN,0,1,0);
+  //   glPushMatrix();
+  //   // sbtracting only 16.28(the width of the vehicle because it's rotation is centered at the front)
+  //     glTranslatef(radius-2*vehicleWidth, 0, 0);
+  //     obstacle(size, material1, material2);
+  //   glPopMatrix();
+  // }
+}
+
+//Flat plane with a texture
+void VehicleWidget::renderPlane(const materialStruct& material){
+
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
+
+  GLfloat normals[][3] = { {0, 1, 0 }};
+  glNormal3fv(normals[0]);
+  glBegin(GL_POLYGON);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-100, -100, 0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f(100, -100, 0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f(100, 100, 0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-100,  100, 0);
+  glEnd();
+}
+
+void VehicleWidget::drawWheel(float inner, float outer, float nsides, float rings, const materialStruct& material1, const materialStruct& material2){
+
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material1.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material1.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material1.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material1.shininess);
+
+  // glutSolidTorus(inner, outer, nsides, rings);
+  glutSolidTorus(inner/2, outer*2, 16, 16);
+
+  // radius, slices, stacks
+  glutSolidSphere((outer-inner)*2, 36, 32);
+
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material2.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material2.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material2.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material2.shininess);
+  glutSolidTorus(inner, outer, nsides, rings);
 }
 
 // static windows of a vehicle
@@ -777,15 +984,14 @@ void VehicleWidget::vehicleSideGround(float side, const materialStruct& material
 
   //SECOND Doors
   glNormal3fv(glm::value_ptr(normal3Points({19,7,side,19,0,side,28,0,side})));
-
   glPushMatrix();
     glBegin(GL_TRIANGLES);//9
       glVertex3f(19,7,side);
       glVertex3f(19,0,side);
       glVertex3f(28,0,side);
     glEnd();
-    glNormal3fv(glm::value_ptr(normal3Points({28,0,side,28,7,side,19,7,side})));
 
+    glNormal3fv(glm::value_ptr(normal3Points({28,0,side,28,7,side,19,7,side})));
     glBegin(GL_TRIANGLES);//10
       glVertex3f(28,0,side);
       glVertex3f(28,7,side);
@@ -795,56 +1001,55 @@ void VehicleWidget::vehicleSideGround(float side, const materialStruct& material
 
   //THIRD
   glNormal3fv(glm::value_ptr(normal3Points({28,0,side,34,0,side,28,7,side})));
-
   glBegin(GL_TRIANGLES);//11
     glVertex3f(28,0,side);
     glVertex3f(34,0,side);
     glVertex3f(28,7,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({34,7,side,28,7,side,34,0,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({34,7,side,28,7,side,34,0,side})));
   glBegin(GL_TRIANGLES);//12
     glVertex3f(34,7,side);
     glVertex3f(28,7,side);
     glVertex3f(34,0,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({34,3,side,37,7,side,34,7,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({34,3,side,37,7,side,34,7,side})));
   glBegin(GL_TRIANGLES);//13
     glVertex3f(34,3,side);
     glVertex3f(37,7,side);
     glVertex3f(34,7,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({35,5.5,side,41,5.5,side,37,7,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({35,5.5,side,41,5.5,side,37,7,side})));
   glBegin(GL_TRIANGLES);//14
     glVertex3f(36,5.5,side);
     glVertex3f(41,5.5,side);
     glVertex3f(37,7,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({41,5.5,side,41,7,side,37,7,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({41,5.5,side,41,7,side,37,7,side})));
   glBegin(GL_TRIANGLES);//15
     glVertex3f(41,5.5,side);
     glVertex3f(41,7,side);
     glVertex3f(37,7,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({41,7,side,41,5.5,side,43,5.5,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({41,7,side,41,5.5,side,43,5.5,side})));
   glBegin(GL_TRIANGLES);//16
     glVertex3f(41,7,side);
     glVertex3f(41,5.5,side);
     glVertex3f(43,5.5,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({41,5.5,side,43,3,side,43,5.5,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({41,5.5,side,43,3,side,43,5.5,side})));
   glBegin(GL_TRIANGLES);//17
     glVertex3f(41,5.5,side);
     glVertex3f(43,3,side);
     glVertex3f(43,5.5,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({43,5.5,side,43,3,side,46,3,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({43,5.5,side,43,3,side,46,3,side})));
   glBegin(GL_TRIANGLES);//18
     glVertex3f(43, 5.5,side);
     glVertex3f(43,3,side);
@@ -867,14 +1072,13 @@ void VehicleWidget::vehicleSideGround(float side, const materialStruct& material
 
 //NOW THE MIDDLE AREA BETWEEN GROUNDSIDE AND WINDOW
   glNormal3fv(glm::value_ptr(normal3Points({19,7,side,47,8,side,19,8,side})));
-
   glBegin(GL_TRIANGLES);
     glVertex3f(19,7,side);
     glVertex3f(47,8,side);
     glVertex3f(19,8,side);
   glEnd();
-  glNormal3fv(glm::value_ptr(normal3Points({19,7,side,47,7,side,47,8,side})));
 
+  glNormal3fv(glm::value_ptr(normal3Points({19,7,side,47,7,side,47,8,side})));
   glBegin(GL_TRIANGLES);
     glVertex3f(19,7,side);
     glVertex3f(47,7,side);
@@ -952,8 +1156,8 @@ void VehicleWidget::unifyVehicle(){
     glTranslatef(-radius-0.1*radius, 0, 0);//move vehicle in circle
 
     glRotatef(70+radius/10, 0,1,0);//Rotate the car itself
-    this->wheelAxes(1, 6.5, vehicleWidth, 1.8);
-    this->wheelAxes(1, 38.5, vehicleWidth, 1.8);
+    this->wheelAxes(3, 6.5, vehicleWidth, 1.8);
+    this->wheelAxes(3, 38.5, vehicleWidth, 1.8);
 
     //Stationary parts of a Vehicle
     this->vehicleSideGround(-vehicleWidth, mediumSteelMaterials);
@@ -1013,94 +1217,32 @@ void VehicleWidget::unifyVehicle(){
   glPopMatrix();
 }
 
-void VehicleWidget::makeLight(float x, float y, float z, float w, const materialStruct& material){
-  // setting light position in the scene
-  GLfloat light_pos[] = {x,y,z, w};
-  glEnable(GL_LIGHTING); // enable lighting in general
-  glEnable(GL_LIGHT0);   // each light source must also be enabled
-  glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
+// called when OpenGL context is set up
+void VehicleWidget::initializeGL()
+	{
+	// set the widget background colour as BLACK
+	glClearColor(0, 0, 0, 0.0);
 
-  // The Sphere depicting where the light is comming from
-  //makes light to visualise better
-  glPushMatrix();
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
-    glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
-    glTranslatef(x,y,z);
-    glutSolidSphere(2*2, 36, 32);
-  glPopMatrix();
+  qobj = gluNewQuadric();
+  gluQuadricNormals(qobj, GLU_SMOOTH);
+
+	glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  glOrtho(-100.,100.,-100.,100.,-600.,600);
 }
 
-void VehicleWidget::obstacle(float size,const materialStruct& material1, const materialStruct& material2){
 
-  glPushMatrix();
-    glRotatef(-90,1,0,0);
+// called every time the widget is resized
+void VehicleWidget::resizeGL(int w, int h){
+  glViewport(0, 0, w, h);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 
-    glPushMatrix();
-      glMaterialfv(GL_FRONT, GL_AMBIENT,    material1.ambient);
-      glMaterialfv(GL_FRONT, GL_DIFFUSE,    material1.diffuse);
-      glMaterialfv(GL_FRONT, GL_SPECULAR,   material1.specular);
-      glMaterialf(GL_FRONT, GL_SHININESS,   material1.shininess);
-      glutSolidTorus(size/4, size, 16,8);
-      glTranslatef(0,0,size);
-      // radius, slices, stacks
-      glutSolidSphere(size/2, 16,2);
-    glPopMatrix();
-
-    glMaterialfv(GL_FRONT, GL_AMBIENT,    material2.ambient);
-    glMaterialfv(GL_FRONT, GL_DIFFUSE,    material2.diffuse);
-    glMaterialfv(GL_FRONT, GL_SPECULAR,   material2.specular);
-    glMaterialf(GL_FRONT, GL_SHININESS,   material2.shininess);
-    //obj, base(bottom), base(top), length(height), slices, stacks
-    gluCylinder(qobj, size, size/2, size, 10, 1);
-  glPopMatrix();
-}
-
-void VehicleWidget::spawnObstacles(int inN, int outN, float size, const materialStruct& material1, const materialStruct& material2){
-
-  //outter obstacles
-  for(int i=0; i<outN; i++){
-   glRotatef(360.0/outN,0,1,0);
-    glPushMatrix();
-    // adding additional 30 because of the vehicle lenght
-      glTranslatef(radius+2*vehicleWidth+radius/8, 0, 0);
-      obstacle(size, material1, material2);
-    glPopMatrix();
-  }
-
-  //TODO: uncomment for inner obstacles
-  // inner obstacles
-  // for(int i=0; i<inN; i++){
-  //  glRotatef(360.0/inN,0,1,0);
-  //   glPushMatrix();
-  //   // sbtracting only 16.28(the width of the vehicle because it's rotation is centered at the front)
-  //     glTranslatef(radius-2*vehicleWidth, 0, 0);
-  //     obstacle(size, material1, material2);
-  //   glPopMatrix();
-  // }
-}
-
-//Flat plane with a texture
-void VehicleWidget::renderPlane(const materialStruct& material){
-
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
-  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
-
-  GLfloat normals[][3] = { {0, 1, 0 }};
-  glNormal3fv(normals[0]);
-  glBegin(GL_POLYGON);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-100, -100, 0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(100, -100, 0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(100, 100, 0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(-100,  100, 0);
-  glEnd();
+  //Textures
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
 // called every time the widget needs painting
@@ -1114,27 +1256,27 @@ void VehicleWidget::paintGL(){
 	glMatrixMode(GL_MODELVIEW);
  	glEnable(GL_DEPTH_TEST);
 
-    glRotatef(_y_camera_angle, 1., 0., 0.); //vertical widget
-    glRotatef(_x_camera_angle, 0, 1., 0.); //Horizontal widget
+  glRotatef(_y_camera_angle, 1., 0., 0.); //vertical widget
+  glRotatef(_x_camera_angle, 0, 1., 0.); //Horizontal widget
 
-    glScalef(_scaler,_scaler,_scaler);//zooming in/out
-
-    //making light responsive to the radius
-    glPushMatrix();
-      glRotatef(_rotateLight, 0,1,0);
-      if(_b_lighting)makeLight(0.6*radius,radius,0,0.2,brassMaterials);
-      else{  glDisable(GL_LIGHTING);}
-    glPopMatrix();
-
+  glScalef(_scaler,_scaler,_scaler);//zooming in/out
 
   /* For an appropriate scaling of a plane and racetrack texture
       using https://www.dcode.fr/function-equation-finder*/
   float raceTrackScaler = 0.0357506 * pow(radius,0.827275) - 0.11963;
 
-    /* The bottom texture(plain black) and only visible when lighting is on
-      because if lghting is off and view is from the top nothing else apart plane is visible*/
+    //transforming by the wheel size
+    glTranslatef(0,-5,0);
     if(_b_lighting){
-      glTranslatef(0,-4,0);
+      /*making light responsive to the radius
+      It does not indicate a star, it is just a light source*/
+      glPushMatrix();
+        glRotatef(_rotateLight, 0,1,0);
+        makeLight(1.5*radius,radius,0,0.2,brassMaterials);
+      glPopMatrix();
+
+      /* The bottom texture(plain black) and only visible when lighting is on
+        because if lghting is off and view is from the top nothing else apart plane is visible*/
       glPushMatrix();
         if(radius>65)
           glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
@@ -1144,35 +1286,13 @@ void VehicleWidget::paintGL(){
         this->renderPlane(blackMaterial);
       glPopMatrix();
     }
+    else{
+      glDisable(GL_LIGHTING);
+      glDisable(GL_LIGHT0);
+    }
 
-//GLOBE texture and RACETRACK texture
-  if(_b_textures){
-    // The Racetrack texture
-    glPushMatrix();
-    //since the texture is not fully symetrical circle, i have to translate it and scale it manually
-      glTranslatef(0,0,-5);
-      if(radius<120)
-        glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
-      else glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
-      glRotatef(180, 0, 1, 0);
-      glRotatef(90, 1, 0, 0);
-      glRotatef(180, 0, 0, 1);
-
-      glEnable(GL_TEXTURE_2D);
-      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
-      this->renderPlane(whiteShinyMaterials);
-      glDisable(GL_TEXTURE_2D);
-    glPopMatrix();
-
-    //The Globe
-    glPushMatrix();
-      glScalef(radius,radius,radius);
-      glRotatef(_rotateEarth, 0, 1, 0);
-      glRotatef(90, 1,0,0);
-      glRotatef(180, 0,1,0);
-      this->sphereWithTexture();
-    glPopMatrix();
-  }
+  //GLOBE texture and RACETRACK texture
+  if(_b_textures){drawTextures(raceTrackScaler);}
 
   if(_b_obstacles){
     //number of inner obstacles, number of outer obstacles, height of obstacle
@@ -1185,10 +1305,15 @@ void VehicleWidget::paintGL(){
     //setting camera, target and face
     gluLookAt(50,50,0,  0,0,0,  0,0,1);
 
+
+    //Drawing Vehicle
     unifyVehicle();
 
 	glFlush();
 }
+
+
+//UI
 
 // Dialog opens on double mouse click event
 void VehicleWidget::mouseDoubleClickEvent(QMouseEvent* event )
@@ -1214,7 +1339,7 @@ void VehicleWidget::LoadDialog()
 // Chaning the variables with additional constraints
 void VehicleWidget::UnloadDialog(const Ui_Dialog& dialog)
 {
-  if(dialog.pos1->toPlainText().toFloat()>=0 && dialog.pos1->toPlainText().toFloat()<=40){
+  if(dialog.pos1->toPlainText().toFloat()>=0){
     speed = dialog.pos1->toPlainText().toFloat();
   }
   if(dialog.at1->toPlainText().toFloat()>=50 && dialog.at1->toPlainText().toFloat()<=200){

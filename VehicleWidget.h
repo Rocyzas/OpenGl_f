@@ -7,14 +7,11 @@
 #include <QObject>
 #include <iostream>
 
-struct materialStruct;
-
-const unsigned int N_COLOR   = 3;
-
-
-#include "Drawings.h"
 #include "Image.h"
 #include "ui_dialog.h"
+
+struct materialStruct;
+
 
 class VehicleWidget: public QGLWidget{
 
@@ -33,9 +30,8 @@ class VehicleWidget: public QGLWidget{
 	void zoomIn(int);
 	void doorsOpen(int);
 	void windowTranslate(int);
-	// void moveVehicle(int);
 	void openBoot(int);
-	// void updateAngleManual(int);
+
 
 
 	protected:
@@ -51,31 +47,40 @@ class VehicleWidget: public QGLWidget{
 		bool _b_lighting;
 		bool _b_textures;
 		bool _b_obstacles;
-		double _angle;
+
 		double _rotateLight;
 		double _rotateEarth;
 		double _angleWhole; //for a whole car
-		double _scaler;
-		double _movement;
-		double _y_camera_angle;
-		double _x_camera_angle;
 		double _wheelRotate;
 		int _doorsAngle;
+
 		double _windowTranslate;
 		double _bootTranslate;
 
+		double _scaler;
+		double _y_camera_angle;
+		double _x_camera_angle;
 
-		glm::vec3 normal3Points(const std::array<double, 9>&);
+
 
 		Image   _imageMarc;
 		Image   _imageRaceTrack;
 		Image   _imageMap;
 
-		void drawWheel(float, float, float, float, const materialStruct&, const materialStruct&);
-		void sphere(const materialStruct&);
-		void wheelAxes(float, float , float, float);
-		void sphereWithTexture();
+		glm::vec3 normal3Points(const std::array<double, 9>&);
 
+
+		void sphereWithTexture();
+		void renderPlane(const materialStruct&);
+		void makeLight(float, float, float, float, const materialStruct&);
+		void obstacle(float, const materialStruct&, const materialStruct&);
+		void spawnObstacles(int,int, float,const materialStruct&,const materialStruct&);
+		void drawTextures(float);
+
+
+		void drawDodecahedron(const materialStruct&); //the convex object
+		void drawWheel(float, float, float, float, const materialStruct&, const materialStruct&);
+		void wheelAxes(float, float , float, float);
 		void vehicleBootTop(double, float, const materialStruct&);
 		void vehicleBootBottom(float, const materialStruct&);
 		void vehicleRoof(float, const materialStruct&);
@@ -85,11 +90,6 @@ class VehicleWidget: public QGLWidget{
 		void vehicleSideUper(float, const materialStruct&);
 		void vehicleDynaWindows(float, const materialStruct&);
 		void vehicleStatWindows(float, const materialStruct&);
-
-		void renderPlane(const materialStruct&);
-		void makeLight(float, float, float, float, const materialStruct&);
-		void obstacle(float, const materialStruct&, const materialStruct&);
-		void spawnObstacles(int,int, float,const materialStruct&,const materialStruct&);
 
 		void unifyVehicle();
 
