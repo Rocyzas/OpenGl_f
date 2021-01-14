@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QTextEdit" name="pos1">
+  <widget class="QTextEdit" name="spd">
    <property name="geometry">
     <rect>
      <x>70</x>
@@ -40,7 +40,7 @@
    </property>
   </widget>
 
-  <widget class="QTextEdit" name="at1">
+  <widget class="QTextEdit" name="rad">
    <property name="geometry">
     <rect>
      <x>70</x>
@@ -51,12 +51,34 @@
    </property>
   </widget>
 
-  <widget class="QTextEdit" name="up1">
+  <widget class="QTextEdit" name="wid">
    <property name="geometry">
     <rect>
      <x>70</x>
      <y>120</y>
      <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+
+  <!-- <widget class="QTextEdit" name="col">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>160</y>
+     <width>121</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget> -->
+
+  <widget class="QTextEdit" name="asteroids">
+   <property name="geometry">
+    <rect>
+     <x>280</x>
+     <y>160</y>
+     <width>71</width>
      <height>21</height>
     </rect>
    </property>
@@ -126,6 +148,34 @@
    </property>
    <property name="text">
     <string>Width</string>
+   </property>
+  </widget>
+
+  <!-- <widget class="QLabel" name="label_6">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>160</y>
+     <width>58</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Material</string>
+   </property>
+  </widget> -->
+
+  <widget class="QLabel" name="label_5">
+   <property name="geometry">
+    <rect>
+     <x>200</x>
+     <y>160</y>
+     <width>78</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Asteroids</string>
    </property>
   </widget>
 

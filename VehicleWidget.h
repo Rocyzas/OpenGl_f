@@ -76,7 +76,8 @@ class VehicleWidget: public QGLWidget{
 		void obstacle(float, const materialStruct&, const materialStruct&);
 		void spawnObstacles(int,int, float,const materialStruct&,const materialStruct&);
 		void drawTextures(float);
-
+		float getRandom(float, float);
+		void asteroid();
 
 		void drawDodecahedron(const materialStruct&); //the convex object
 		void drawWheel(float, float, float, float, const materialStruct&, const materialStruct&);
@@ -84,7 +85,7 @@ class VehicleWidget: public QGLWidget{
 		void vehicleBootTop(double, float, const materialStruct&);
 		void vehicleBootBottom(float, const materialStruct&);
 		void vehicleRoof(float, const materialStruct&);
-		void vehicleWheelBumbers(float, const materialStruct&);
+		void vehicleWheelBumpers(float, const materialStruct&);
 		void vehicleSideGround(float, const materialStruct&);
 		void vehicleDoors(float, const materialStruct&);
 		void vehicleSideUper(float, const materialStruct&);

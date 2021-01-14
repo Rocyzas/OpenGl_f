@@ -12,12 +12,14 @@
 static const int StartingPosition = 80;
 static const float PI = 3.1415926535;
 
+int asterNumber=100; //number of asteroids(default)
+// float v=1; //for material properties
+
 float vehicleWidth=8.14;
 float speed = 0.7;
 float TotalDistance = 0;
-GLfloat radius = 50;
+GLfloat radius = 60;
 GLUquadric* qobj;
-
 
 // constructor
 VehicleWidget::VehicleWidget(QWidget *parent)
@@ -126,24 +128,26 @@ static materialStruct light0SteelMaterials ={
   { 0.5, 0.5, 0.5, 1.0},
   20
 };
-
-static materialStruct brassMaterials = {
-  { 0.33, 0.22, 0.03, 1.0},
-  { 0.78, 0.57, 0.11, 1.0},
-  { 0.99, 0.91, 0.81, 1.0},
-  27.8
-};
 static materialStruct whiteShinyMaterials = {
   { 1.0, 1.0, 1.0, 1.0},
   { 1.0, 1.0, 1.0, 1.0},
   { 1.0, 1.0, 1.0, 1.0},
   100.0
 };
-static materialStruct blackMaterial = {
-  { 0.0, 0.0, 0.0, 0.0},
-  { 0.0, 0.0, 0.0, 0.0},
-  { 0.0, 0.0, 0.0, 0.0},
-  100.0
+//not dynamic
+static materialStruct brassMaterials = {
+  { 0.33, 0.22, 0.03, 1.0},
+  { 0.78, 0.57, 0.11, 1.0},
+  { 0.99, 0.91, 0.81, 1.0},
+  27.8
+};
+
+// not dynamic materials
+static materialStruct stoneMaterials = {
+  { 0.45, 0.25, 0.3, 1},
+  { 0.45, 0.43, 0.3, 1},
+  { 0.2, 0.2, 0.2, 1},
+  50.0
 };
 static materialStruct redShinyMaterials = {
   { 1.0, 0.0, 0.0, 0.0},
@@ -273,45 +277,82 @@ void VehicleWidget::drawDodecahedron(const materialStruct& material){
 
 }
 
+float VehicleWidget::getRandom(float a, float b){
+  float ret = a + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(b-a)));
+  return ret;
+}
+
+void VehicleWidget::asteroid(){
+
+  srand(10);
+
+  for(int i=0; i<asterNumber; i++){
+    glPushMatrix();
+
+    float rand1 = getRandom(0.1, 1);
+    int even = int(10*getRandom(1,10))%2==1?1:-1;
+
+      glRotatef(even*rand1*_rotateLight, 0, 1, 0);
+
+    even = int(10*getRandom(1,10))%2==1?1:-1;//restarting even
+      glTranslatef(even*getRandom(2*radius, 6*radius),getRandom(-1.5*radius, 2.5*radius), 0);
+
+    float rand2 = getRandom(0.1, 3);
+    even = int(rand2)%2==1?1:-1;
+      glRotatef(even*rand2/_rotateLight, int(getRandom(1, 10))%2 ,int(getRandom(1, 10))%2 ,int(getRandom(1, 10))%2 );
+
+    float randomScale = getRandom(1,6);
+      glScalef(randomScale, randomScale, randomScale);
+      drawDodecahedron(stoneMaterials);
+
+    glPopMatrix();
+  }
+
+}
+
 void VehicleWidget::makeLight(float x, float y, float z, float w, const materialStruct& material){
   // setting light position in the scene
-  GLfloat light_pos[] = {x,y,z, w};
+  glPushMatrix();
+  glRotatef(_rotateLight, 0,1,0); //uncomment for rotating light
+
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
+  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
+  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
+  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
+
+  GLfloat light_pos[] = {x, y, z, w};
   glEnable(GL_LIGHTING); // enable lighting in general
   glEnable(GL_LIGHT0);   // each light source must also be enabled
   glLightfv(GL_LIGHT0, GL_POSITION, light_pos);
 
-  // The Sphere depicting where the light is comming from
-  //makes light to visualise better
-  glPushMatrix();
-    glTranslatef(x,y,z);
-    glRotatef(_rotateLight*2, 1, 1, 1);
-    glScalef(5,5,5); //constant size
-    drawDodecahedron(material);
+  //light sphere
+    glPushMatrix();
+      glTranslatef(x,y, z);
+      glRotatef(_rotateLight, 1, 1, 1);
+      glScalef(5,5,5); //constant size
+      // drawDodecahedron(brassMaterials);
+      glutSolidSphere(1,16,16);
+    glPopMatrix();
   glPopMatrix();
 }
 
 void VehicleWidget::drawTextures(float raceTrackScaler){
+
   // The Racetrack texture
   glPushMatrix();
   //since the texture is not fully symetrical circle, i have to translate it and scale it manually
     glTranslatef(0,0,-5);
     if(radius<120)
       glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
-    else glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
-    glRotatef(180, 0, 1, 0);
-    glRotatef(90, 1, 0, 0);
-    glRotatef(180, 0, 0, 1);
-
-    glEnable(GL_TEXTURE_2D);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
+    else
+      glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler+0.1*raceTrackScaler);
+    glRotatef(-90, 0, 1, 0);
     this->renderPlane(whiteShinyMaterials);
-    glDisable(GL_TEXTURE_2D);
   glPopMatrix();
 
   //The Globe
   glPushMatrix();
     glScalef(radius,radius,radius);
-
     glRotatef(_rotateEarth, 0, 1, 0);
     glRotatef(90, 1,0,0);
     glRotatef(180, 0,1,0);
@@ -353,6 +394,7 @@ glm::vec3 VehicleWidget::normal3Points(const std::array<double, 9>& params){
 
 void VehicleWidget::sphereWithTexture(){
 
+  glPushMatrix();
     GLUquadricObj *gobj=gluNewQuadric();
 
     gluQuadricDrawStyle(gobj,GLU_FILL);
@@ -362,11 +404,11 @@ void VehicleWidget::sphereWithTexture(){
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageMap.Width(), _imageMap.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageMap.imageField());
 
     glEnable(GL_TEXTURE_2D);
-    gluSphere(gobj,0.75f,32,32);
-
-    glFinish();
+      gluSphere(gobj,0.75f,32,32);
+      glFinish();
     glDisable(GL_TEXTURE_2D);
     gluDeleteQuadric(gobj);
+  glPopMatrix();
 }
 
 void VehicleWidget::obstacle(float size,const materialStruct& material1, const materialStruct& material2){
@@ -418,26 +460,34 @@ void VehicleWidget::spawnObstacles(int inN, int outN, float size, const material
   // }
 }
 
-//Flat plane with a texture
+//Flat plane with or without texture texture
 void VehicleWidget::renderPlane(const materialStruct& material){
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
-  glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
-  glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
-  glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
+    glPushMatrix();
+    glEnable(GL_TEXTURE_2D);
+      glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
+      glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
+      glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
+      glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
 
-  GLfloat normals[][3] = { {0, 1, 0 }};
-  glNormal3fv(normals[0]);
-  glBegin(GL_POLYGON);
-    glTexCoord2f(0.0, 0.0);
-    glVertex3f(-100, -100, 0);
-    glTexCoord2f(1.0, 0.0);
-    glVertex3f(100, -100, 0);
-    glTexCoord2f(1.0, 1.0);
-    glVertex3f(100, 100, 0);
-    glTexCoord2f(0.0, 1.0);
-    glVertex3f(-100,  100, 0);
-  glEnd();
+      glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, _imageRaceTrack.Width(), _imageRaceTrack.Height(), 0, GL_RGB, GL_UNSIGNED_BYTE, _imageRaceTrack.imageField());
+
+      //making lighting from the top
+      GLfloat normals[][3] = { {0, 1, 0 }};
+      glNormal3fv(normals[0]);
+      glBegin(GL_POLYGON);
+        glTexCoord2f(0.0, 0.0);
+        glVertex3f(-100, 0, -100);
+        glTexCoord2f(1.0, 0.0);
+        glVertex3f(-100, 0, 100);
+        glTexCoord2f(1.0, 1.0);
+        glVertex3f(100, 0, 100);
+        glTexCoord2f(0.0, 1.0);
+        glVertex3f(100, 0, -100);
+      glEnd();
+
+    glDisable(GL_TEXTURE_2D);
+    glPopMatrix();
 }
 
 void VehicleWidget::drawWheel(float inner, float outer, float nsides, float rings, const materialStruct& material1, const materialStruct& material2){
@@ -745,7 +795,7 @@ void VehicleWidget::vehicleDoors(float side, const materialStruct& material){
 
 
 
-void VehicleWidget::vehicleWheelBumbers(float side, const materialStruct& material){
+void VehicleWidget::vehicleWheelBumpers(float side, const materialStruct& material){
   float adder = (side>0)?1:-1;
 
   glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
@@ -928,7 +978,7 @@ void VehicleWidget::vehicleWheelBumbers(float side, const materialStruct& materi
 
 void VehicleWidget::vehicleSideGround(float side, const materialStruct& material){
 
-  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient); //spalvos tsg
+  glMaterialfv(GL_FRONT, GL_AMBIENT,    material.ambient);
   glMaterialfv(GL_FRONT, GL_DIFFUSE,    material.diffuse);
   glMaterialfv(GL_FRONT, GL_SPECULAR,   material.specular);
   glMaterialf(GL_FRONT, GL_SHININESS,   material.shininess);
@@ -1156,8 +1206,11 @@ void VehicleWidget::unifyVehicle(){
     glTranslatef(-radius-0.1*radius, 0, 0);//move vehicle in circle
 
     glRotatef(70+radius/10, 0,1,0);//Rotate the car itself
-    this->wheelAxes(3, 6.5, vehicleWidth, 1.8);
-    this->wheelAxes(3, 38.5, vehicleWidth, 1.8);
+    this->wheelAxes(2.9, 6.5, vehicleWidth, 1.75);
+    this->wheelAxes(2.9, 38.5, vehicleWidth, 1.75);
+
+    this->vehicleWheelBumpers(-vehicleWidth, mediumSteelMaterials);
+    this->vehicleWheelBumpers(vehicleWidth, mediumSteelMaterials);
 
     //Stationary parts of a Vehicle
     this->vehicleSideGround(-vehicleWidth, mediumSteelMaterials);
@@ -1221,7 +1274,7 @@ void VehicleWidget::unifyVehicle(){
 void VehicleWidget::initializeGL()
 	{
 	// set the widget background colour as BLACK
-	glClearColor(0, 0, 0, 0.0);
+  glClearColor(0, 0, 0, 0.0);
 
   qobj = gluNewQuadric();
   gluQuadricNormals(qobj, GLU_SMOOTH);
@@ -1256,40 +1309,31 @@ void VehicleWidget::paintGL(){
 	glMatrixMode(GL_MODELVIEW);
  	glEnable(GL_DEPTH_TEST);
 
-  glRotatef(_y_camera_angle, 1., 0., 0.); //vertical widget
+  glRotatef(_y_camera_angle, 1., 0., 0.); //Vertical widget
   glRotatef(_x_camera_angle, 0, 1., 0.); //Horizontal widget
 
   glScalef(_scaler,_scaler,_scaler);//zooming in/out
+
+
 
   /* For an appropriate scaling of a plane and racetrack texture
       using https://www.dcode.fr/function-equation-finder*/
   float raceTrackScaler = 0.0357506 * pow(radius,0.827275) - 0.11963;
 
-    //transforming by the wheel size
-    glTranslatef(0,-5,0);
-    if(_b_lighting){
-      /*making light responsive to the radius
-      It does not indicate a star, it is just a light source*/
-      glPushMatrix();
-        glRotatef(_rotateLight, 0,1,0);
-        makeLight(1.5*radius,radius,0,0.2,brassMaterials);
-      glPopMatrix();
+  //transforming by the wheel size
+  glTranslatef(0,-5,0);
 
-      /* The bottom texture(plain black) and only visible when lighting is on
-        because if lghting is off and view is from the top nothing else apart plane is visible*/
-      glPushMatrix();
-        if(radius>65)
-          glScalef(raceTrackScaler,raceTrackScaler,raceTrackScaler);
-        glTranslatef(0,-0.01,0);
-        glRotatef(90, 1, 0, 0);
-        glRotatef(180, 0, 0, 1);
-        this->renderPlane(blackMaterial);
-      glPopMatrix();
-    }
-    else{
-      glDisable(GL_LIGHTING);
-      glDisable(GL_LIGHT0);
-    }
+  if(_b_lighting){
+    /*making light responsive to the radius
+    It does not indicate a star, it is just a light source*/
+
+    makeLight(1.5*radius,radius,0,1,redShinyMaterials);
+
+  }
+  else{
+    glDisable(GL_LIGHTING);
+    glDisable(GL_LIGHT0);
+  }
 
   //GLOBE texture and RACETRACK texture
   if(_b_textures){drawTextures(raceTrackScaler);}
@@ -1301,10 +1345,11 @@ void VehicleWidget::paintGL(){
     spawnObstacles(inner, outter, 2, redShinyMaterials, brassMaterials); //set min max(40)
   }
 
+  asteroid();
+
   	glLoadIdentity();
     //setting camera, target and face
     gluLookAt(50,50,0,  0,0,0,  0,0,1);
-
 
     //Drawing Vehicle
     unifyVehicle();
@@ -1312,8 +1357,6 @@ void VehicleWidget::paintGL(){
 	glFlush();
 }
 
-
-//UI
 
 // Dialog opens on double mouse click event
 void VehicleWidget::mouseDoubleClickEvent(QMouseEvent* event )
@@ -1328,9 +1371,10 @@ void VehicleWidget::mouseDoubleClickEvent(QMouseEvent* event )
 // Loading the dialog
 void VehicleWidget::LoadDialog()
 {
-  _ui.pos1->setText(QString::number(speed));
-  _ui.at1->setText(QString::number(radius));
-  _ui.up1->setText(QString::number(vehicleWidth));
+  _ui.spd->setText(QString::number(speed));
+  _ui.rad->setText(QString::number(radius));
+  _ui.wid->setText(QString::number(vehicleWidth));
+  _ui.asteroids->setText(QString::number(asterNumber));
   _ui.blight->setCheckState(_b_lighting ? Qt::Checked : Qt::Unchecked);
   _ui.btextures->setCheckState(_b_textures ? Qt::Checked : Qt::Unchecked);
   _ui.bobstacles->setCheckState(_b_obstacles ? Qt::Checked : Qt::Unchecked);
@@ -1339,14 +1383,26 @@ void VehicleWidget::LoadDialog()
 // Chaning the variables with additional constraints
 void VehicleWidget::UnloadDialog(const Ui_Dialog& dialog)
 {
-  if(dialog.pos1->toPlainText().toFloat()>=0){
-    speed = dialog.pos1->toPlainText().toFloat();
-  }
-  if(dialog.at1->toPlainText().toFloat()>=50 && dialog.at1->toPlainText().toFloat()<=200){
-      radius = dialog.at1->toPlainText().toFloat();
+  // speed
+  if(dialog.spd->toPlainText().toFloat()>=0){
+    speed = dialog.spd->toPlainText().toFloat();
   }
 
-  vehicleWidth = dialog.up1->toPlainText().toFloat(); //freedom
+  // radius
+  if(dialog.rad->toPlainText().toFloat()>=50 && dialog.rad->toPlainText().toFloat()<=200){
+    radius = dialog.rad->toPlainText().toFloat();
+  }
+
+  //width
+  if(dialog.wid->toPlainText().toFloat()>=1 && dialog.wid->toPlainText().toFloat()<=200){
+    vehicleWidth = dialog.wid->toPlainText().toFloat();
+  }
+
+  //number of asteroids
+  if(dialog.asteroids->toPlainText().toFloat()>=0){
+    asterNumber = dialog.asteroids->toPlainText().toFloat();
+  }
+
   _b_lighting = (_ui.blight->checkState() == Qt::Checked) ? true : false;
   _b_textures = (_ui.btextures->checkState() == Qt::Checked) ? true : false;
   _b_obstacles = (_ui.bobstacles->checkState() == Qt::Checked) ? true : false;
