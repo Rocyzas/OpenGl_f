@@ -1,6 +1,15 @@
-# OpenGl_f
-OpenGL Graphics
+# Mini OpenGL learning project
 
+A rotating cybertruck with a list of features implemented:
+- Plane Ground
+- Vehicle Parts
+- Hierarchical Modelling
+- Road Columns
+- Textures
+- Normals for Lighting
+- User Interface
+
+![Image](Cybertruck.png)
 ![Image](ScreenshotImage.png)
 
 
